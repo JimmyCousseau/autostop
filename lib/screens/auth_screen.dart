@@ -20,6 +20,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String _errorMessage = ''; // Store error message
 
   void _signIn() async {
+    final navigator = Navigator.of(context);
     try {
       final UserCredential userCredential =
           await _auth.signInWithEmailAndPassword(
@@ -28,8 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
       );
       if (userCredential.user != null) {
         // Navigate to MapScreen after successful login
-        Navigator.pushReplacement(
-          context,
+        navigator.pushReplacement(
           MaterialPageRoute(builder: (_) => const MapScreen()),
         );
       }
@@ -41,6 +41,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _register() async {
+    final navigator = Navigator.of(context);
     try {
       if (_passwordController.text == _confirmPasswordController.text) {
         final UserCredential userCredential =
@@ -50,8 +51,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
         if (userCredential.user != null) {
           // Navigate to MapScreen after successful registration
-          Navigator.pushReplacement(
-            context,
+          navigator.pushReplacement(
             MaterialPageRoute(builder: (_) => const MapScreen()),
           );
         } else {
@@ -78,49 +78,52 @@ class _AuthScreenState extends State<AuthScreen> {
         title: const Text('Authentification'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextFormField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Mot de passe'),
-              obscureText: true,
-            ),
-            if (_isRegistering) // Conditionally show Confirm Password field
+        child: SizedBox(
+          width: 400.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               TextFormField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                    labelText: 'Confirmer le mot de passe'),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Mot de passe'),
                 obscureText: true,
               ),
-            const SizedBox(height: 20),
-            Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.red),
-            ),
-            if (!_isRegistering)
-              ElevatedButton(
-                onPressed: _signIn,
-                child: const Text('Se connecter'),
+              if (_isRegistering) // Conditionally show Confirm Password field
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  decoration: const InputDecoration(
+                      labelText: 'Confirmer le mot de passe'),
+                  obscureText: true,
+                ),
+              const SizedBox(height: 20),
+              Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.red),
               ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _isRegistering = !_isRegistering;
-                });
-              },
-              child: Text(_isRegistering ? 'Annuler' : 'S\'enregistrer'),
-            ),
-            if (_isRegistering)
+              if (!_isRegistering)
+                ElevatedButton(
+                  onPressed: _signIn,
+                  child: const Text('Se connecter'),
+                ),
               ElevatedButton(
-                onPressed: _register,
-                child: const Text('Valider l\'enregistrement'),
+                onPressed: () {
+                  setState(() {
+                    _isRegistering = !_isRegistering;
+                  });
+                },
+                child: Text(_isRegistering ? 'Annuler' : 'S\'enregistrer'),
               ),
-          ],
+              if (_isRegistering)
+                ElevatedButton(
+                  onPressed: _register,
+                  child: const Text('Valider l\'enregistrement'),
+                ),
+            ],
+          ),
         ),
       ),
     );

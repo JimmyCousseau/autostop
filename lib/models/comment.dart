@@ -1,5 +1,5 @@
 class Comment {
-  String? id;
+  String? documentId;
   final String userMail;
   final String pointId;
   final String title;
@@ -8,6 +8,7 @@ class Comment {
   final DateTime createdAt;
 
   Comment({
+    this.documentId,
     required this.userMail,
     required this.pointId,
     required this.content,

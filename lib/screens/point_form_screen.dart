@@ -42,65 +42,71 @@ class _PointFormScreenState extends State<PointFormScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Merci de compléter la direction';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(labelText: 'Direction'),
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-              ),
-              const SizedBox(height: 16),
-              Text('Latitude: ${widget.point.latitude}'),
-              Text('longitude: ${widget.point.longitude}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final name = _nameController.text;
-                    final description = _descriptionController.text;
-                    final p = Point(
-                      latitude: widget.point.latitude,
-                      longitude: widget.point.longitude,
-                      name: name,
-                      description: description,
-                      createdAt: DateTime.now(),
-                      updatedAt: DateTime.now(),
-                      approved: false,
-                    );
-                    try {
-                      if (p.documentId == null || p.documentId!.isEmpty) {
-                        PointService().addPoint(p);
-                      } else {
-                        PointService().updatePoint(p);
+        child: Center(
+          child: SizedBox(
+            width: 400.0,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Merci de compléter la direction';
                       }
-                    } catch (e) {
-                      const snackBar = SnackBar(
-                          duration: Duration(milliseconds: 5000),
-                          content: Text('Une erreur est survenue'));
-                    }
+                      return null;
+                    },
+                    decoration: const InputDecoration(labelText: 'Direction'),
+                  ),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Latitude: ${widget.point.latitude}'),
+                  Text('longitude: ${widget.point.longitude}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        final name = _nameController.text;
+                        final description = _descriptionController.text;
+                        final p = Point(
+                          latitude: widget.point.latitude,
+                          longitude: widget.point.longitude,
+                          name: name,
+                          description: description,
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                          approved: false,
+                        );
+                        try {
+                          if (p.documentId == null || p.documentId!.isEmpty) {
+                            PointService().addPoint(p);
+                          } else {
+                            PointService().updatePoint(p);
+                          }
+                        } catch (e) {
+                          const snackBar = SnackBar(
+                              duration: Duration(milliseconds: 5000),
+                              content: Text('Une erreur est survenue'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
 
-                    Navigator.pop(context);
-                    const snackBar = SnackBar(
-                        duration: Duration(milliseconds: 5000),
-                        content: Text(
-                            'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                },
-                child: const Text('Save'),
+                        Navigator.pop(context);
+                        const snackBar = SnackBar(
+                            duration: Duration(milliseconds: 5000),
+                            content: Text(
+                                'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

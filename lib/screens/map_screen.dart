@@ -21,7 +21,6 @@ class _MapScreenState extends State<MapScreen> {
   final MapController _mapController = MapController();
   List<Marker> _markers = [];
   Marker? _selectedMarker;
-  Marker? _findMarker;
   final OsmService _osmService = OsmService();
   final Stream<List<Point>> _streamListPoint =
       PointService().getApprovedPointsStream();
@@ -92,7 +91,7 @@ class _MapScreenState extends State<MapScreen> {
                     _selectedMarker = Marker(
                       anchorPos: AnchorPos.align(AnchorAlign.top),
                       builder: (_) => const Icon(Icons.location_on,
-                          size: Point.size, color: Colors.red),
+                          size: Point.size, color: Colors.blue),
                       point: point,
                     );
                     _markers.add(_selectedMarker!);
@@ -124,7 +123,10 @@ class _MapScreenState extends State<MapScreen> {
                         }
                         if (_selectedMarker != null &&
                             _markers.contains(_selectedMarker!)) {
-                          _popupLayerController.togglePopup(_selectedMarker!);
+                          Future.delayed(
+                              const Duration(milliseconds: 100),
+                              () => _popupLayerController
+                                  .showPopupsOnlyFor([_selectedMarker!]));
                         }
 
                         return PopupMarkerLayer(
@@ -208,19 +210,19 @@ class _MapScreenState extends State<MapScreen> {
                               (await _osmService.searchCities(selectedCity))
                                   .first;
                           _mapController.move(city.pos, 13);
-                          setState(() {
-                            if (_findMarker != null) {
-                              _markers.remove(_findMarker);
-                            }
-                            _findMarker = Marker(
-                              builder: (context) => const Icon(
-                                  Icons.location_on,
-                                  size: Point.size,
-                                  color: Colors.blue),
-                              point: city.pos,
-                            );
-                            _markers.add(_findMarker!);
-                          });
+                          // setState(() {
+                          //   if (_findMarker != null) {
+                          //     _markers.remove(_findMarker);
+                          //   }
+                          //   _findMarker = Marker(
+                          //     builder: (context) => const Icon(
+                          //         Icons.location_on,
+                          //         size: Point.size,
+                          //         color: Colors.blue),
+                          //     point: city.pos,
+                          //   );
+                          //   _markers.add(_findMarker!);
+                          // });
                         },
                         decoration: const InputDecoration(
                           border: InputBorder.none,

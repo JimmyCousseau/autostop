@@ -58,7 +58,8 @@ class PopupNewPoint extends StatelessWidget {
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => AuthScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => const AuthScreen()),
                         );
                       }
                     },

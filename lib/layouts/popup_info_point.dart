@@ -78,13 +78,18 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => CommentScreen(
-                                      pointDocumentId:
-                                          widget.point.documentId!),
+                                    pointDocumentId: widget.point.documentId!,
+                                    starRating: StarRating(
+                                      initialRating: averageRate,
+                                      commentCount: commentCount,
+                                    ),
+                                  ),
                                 ),
                               ),
                               child: StarRating(
-                                  initialRating: averageRate,
-                                  commentCount: commentCount),
+                                initialRating: averageRate,
+                                commentCount: commentCount,
+                              ),
                             );
                           } else {
                             return const Text('No data available');

@@ -104,4 +104,8 @@ class CommentService {
   Future<void> createComment(Comment comment) async {
     await commentsCollection.add(comment.toJson());
   }
+
+  Future<void> updateComment(Comment comment) async {
+    await commentsCollection.doc(comment.documentId).update(comment.toJson());
+  }
 }

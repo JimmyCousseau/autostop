@@ -35,8 +35,6 @@ class CommentCard extends StatelessWidget {
               children: [
                 StarRating(
                   initialRating: comment.rate.toDouble(),
-                  commentCount: 0,
-                  showCommentCount: false,
                   showRate: false,
                 ),
                 Text(

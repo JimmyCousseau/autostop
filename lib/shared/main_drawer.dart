@@ -1,3 +1,4 @@
+import 'package:autostop/screens/change_password_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -37,14 +38,18 @@ class MainDrawer extends StatelessWidget {
             ListTile(
               title: const Text('Changer mon mot de passe'),
               onTap: () {
-                // Navigate to the password change screen
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const ChangePasswordScreen()));
               },
             ),
           ListTile(
             title: const Text('Se déconnecter'),
             onTap: () async {
+              final scaffold = Scaffold.of(context);
               await FirebaseAuth.instance.signOut();
-              Scaffold.of(context).closeDrawer();
+              scaffold.closeDrawer();
             },
           ),
         ],

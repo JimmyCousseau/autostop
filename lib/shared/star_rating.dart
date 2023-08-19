@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 
 class StarRating extends StatefulWidget {
   final double initialRating;
-  final int commentCount;
+  final int? commentCount;
   final ValueChanged<double>? onChanged;
-  final bool showCommentCount;
   final bool showRate;
 
   const StarRating({
     super.key,
     required this.initialRating,
     this.onChanged,
-    required this.commentCount,
-    this.showCommentCount = true,
+    this.commentCount,
     this.showRate = true,
   });
 
@@ -75,7 +73,7 @@ class _StarRatingState extends State<StarRating> {
           ] +
           [
             const SizedBox(width: 5),
-            if (widget.showCommentCount)
+            if (widget.commentCount != null)
               Text(
                 '(${widget.commentCount} ${widget.commentCount == 1 ? 'comment' : 'comments'})',
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
