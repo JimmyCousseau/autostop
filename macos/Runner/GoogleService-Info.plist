@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>336514695273-v5pmh1rr1sjql906h0ksf9nvbfrdcfho.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.336514695273-v5pmh1rr1sjql906h0ksf9nvbfrdcfho</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB-e7ixfjtkebGqIJpqJOzUvI9vUJgqEGg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>336514695273</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.autostop</string>
+	<key>PROJECT_ID</key>
+	<string>autostop-acf5d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>autostop-acf5d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:336514695273:ios:f3fbb16ae81326eb0a22f8</string>
+	<key>DATABASE_URL</key>
+	<string>https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

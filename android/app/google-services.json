@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "336514695273",
+    "firebase_url": "https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "autostop-acf5d",
+    "storage_bucket": "autostop-acf5d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336514695273:android:80bcd5251a22a6ec0a22f8",
+        "android_client_info": {
+          "package_name": "com.example.autostop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336514695273-8gn2bficmjialtvo8jdq74fr8oqvb8nn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjgQwhgaJd03RjPuqI31hZIknSVFncIN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336514695273-8gn2bficmjialtvo8jdq74fr8oqvb8nn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
