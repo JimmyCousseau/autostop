@@ -1,7 +1,7 @@
+import 'package:autostop/screens/auth_screen.dart';
 import 'package:autostop/screens/comment_form_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../models/comment.dart';
 import '../services/comment_service.dart';
 import '../shared/comment_card.dart';
 import '../shared/star_rating.dart'; // Import your StarRating widget
@@ -18,7 +18,7 @@ class CommentScreen extends StatefulWidget {
 }
 
 class _CommentScreenState extends State<CommentScreen> {
-  late Future<List<Map<String, dynamic>>> _commentsFuture;
+  late Future<List<Comment>> _commentsFuture;
   Comment? _userComment;
 
   @override
@@ -44,16 +44,23 @@ class _CommentScreenState extends State<CommentScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CommentFormScreen(
-                          userComment: _userComment,
-                          pointDocumentId: widget.pointDocumentId),
+                      builder: (_) {
+                        if (FirebaseAuth.instance.currentUser != null) {
+                          return CommentFormScreen(
+                              userComment: _userComment,
+                              pointDocumentId: widget.pointDocumentId);
+                        }
+                        return const AuthScreen();
+                      },
                     ),
                   );
                 },
-                child: const Text("Écrire un nouveau commentaire")),
+                child: Text(FirebaseAuth.instance.currentUser != null
+                    ? "Écrire un nouveau commentaire"
+                    : "Se connecter pour pouvoir commenter")),
             const SizedBox(height: 16),
             const Text('Autres commentaires:', style: TextStyle(fontSize: 18)),
-            FutureBuilder<List<Map<String, dynamic>>>(
+            FutureBuilder<List<Comment>>(
               future: _commentsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -68,7 +75,7 @@ class _CommentScreenState extends State<CommentScreen> {
                         shrinkWrap: true,
                         itemCount: comments.length,
                         itemBuilder: (context, index) {
-                          final comment = Comment.fromJson(comments[index]);
+                          final comment = comments[index];
                           if (_userComment == null &&
                               comment.userMail ==
                                   FirebaseAuth.instance.currentUser?.email) {

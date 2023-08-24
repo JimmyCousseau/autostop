@@ -1,73 +1,4 @@
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-
-// import '../models/comment.dart';
-
-// class CommentService {
-//   static const String apiUrl =
-//       'http://localhost:3000'; // Replace with your API URL
-
-//   Future<List<Comment>> fetchComments() async {
-//     final response = await http.get(Uri.parse('$apiUrl/comments'));
-
-//     if (response.statusCode == 200) {
-//       final List<dynamic> responseData = json.decode(response.body);
-//       return responseData.map((data) => Comment.fromJson(data)).toList();
-//     } else {
-//       throw Exception('Failed to fetch comments');
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> getCommentCountAndAverageRate(
-//       int pointId) async {
-//     final response =
-//         await http.get(Uri.parse('$apiUrl/comments/count-and-rate/$pointId'));
-
-//     if (response.statusCode == 200) {
-//       return json.decode(response.body);
-//     } else {
-//       throw Exception('Failed to fetch comment count and average rate');
-//     }
-//   }
-
-//   Future<Comment> createComment(Comment comment) async {
-//     final response = await http.post(
-//       Uri.parse('$apiUrl/comments'),
-//       headers: {'Content-Type': 'application/json'},
-//       body: json.encode(comment.toJson()),
-//     );
-
-//     if (response.statusCode == 201) {
-//       return Comment.fromJson(json.decode(response.body));
-//     } else {
-//       throw Exception('Failed to create comment');
-//     }
-//   }
-
-//   Future<void> updateComment(Comment comment) async {
-//     final response = await http.put(
-//       Uri.parse('$apiUrl/comments/${comment.id}'),
-//       headers: {'Content-Type': 'application/json'},
-//       body: json.encode(comment.toJson()),
-//     );
-
-//     if (response.statusCode != 204) {
-//       throw Exception('Failed to update comment');
-//     }
-//   }
-
-//   Future<void> deleteComment(int id) async {
-//     final response = await http.delete(Uri.parse('$apiUrl/comments/$id'));
-
-//     if (response.statusCode != 204) {
-//       throw Exception('Failed to delete comment');
-//     }
-//   }
-// }
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../models/comment.dart';
 
 class CommentService {
   final CollectionReference commentsCollection =
@@ -92,20 +23,67 @@ class CommentService {
     };
   }
 
-  Future<List<Map<String, dynamic>>> getCommentsForPoint(String pointId) async {
+  Future<List<Comment>> getCommentsForPoint(String pointId) async {
     final querySnapshot =
         await commentsCollection.where('point_id', isEqualTo: pointId).get();
 
-    return querySnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    return querySnapshot.docs.map((doc) {
+      if (doc.data() != null) {
+        return Comment.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      } else {
+        throw Exception("Document data is null");
+      }
+    }).toList();
   }
 
   Future<void> createComment(Comment comment) async {
-    await commentsCollection.add(comment.toJson());
+    await commentsCollection.add(comment.toMap());
+  }
+}
+
+class Comment {
+  String? documentId;
+  final String userMail;
+  final String pointId;
+  final String title;
+  final String content;
+  final int rate;
+  final DateTime updatedAt;
+  final bool approved;
+
+  Comment({
+    this.documentId,
+    required this.userMail,
+    required this.pointId,
+    required this.content,
+    required this.rate,
+    required this.updatedAt,
+    required this.title,
+    required this.approved,
+  });
+
+  factory Comment.fromMap(String documentId, Map<String, dynamic> json) {
+    return Comment(
+      documentId: documentId,
+      userMail: json['user_mail'],
+      pointId: json['point_id'],
+      content: json['content'],
+      rate: json['rate'],
+      updatedAt: DateTime.parse(json['updated_at']),
+      title: json['title'],
+      approved: json['approved'],
+    );
   }
 
-  Future<void> updateComment(Comment comment) async {
-    await commentsCollection.doc(comment.documentId).update(comment.toJson());
+  Map<String, dynamic> toMap() {
+    return {
+      'user_mail': userMail,
+      'point_id': pointId,
+      'content': content,
+      'rate': rate,
+      'updated_at': updatedAt.toIso8601String(),
+      'title': title,
+      'approved': approved,
+    };
   }
 }

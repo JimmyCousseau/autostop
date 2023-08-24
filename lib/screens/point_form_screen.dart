@@ -1,4 +1,5 @@
 import 'package:autostop/services/point_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PointFormScreen extends StatefulWidget {
@@ -77,9 +78,11 @@ class _PointFormScreenState extends State<PointFormScreen> {
                           longitude: widget.point.longitude,
                           name: name,
                           description: description,
-                          createdAt: DateTime.now(),
                           updatedAt: DateTime.now(),
                           approved: false,
+                          creatorEmail:
+                              FirebaseAuth.instance.currentUser?.email ??
+                                  "ERROR CRITIQUE",
                         );
                         try {
                           if (p.documentId == null || p.documentId!.isEmpty) {
@@ -87,19 +90,18 @@ class _PointFormScreenState extends State<PointFormScreen> {
                           } else {
                             PointService().updatePoint(p);
                           }
+                          Navigator.pop(context);
+                          const snackBar = SnackBar(
+                              duration: Duration(milliseconds: 5000),
+                              content: Text(
+                                  'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         } catch (e) {
                           const snackBar = SnackBar(
                               duration: Duration(milliseconds: 5000),
                               content: Text('Une erreur est survenue'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
-
-                        Navigator.pop(context);
-                        const snackBar = SnackBar(
-                            duration: Duration(milliseconds: 5000),
-                            content: Text(
-                                'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     },
                     child: const Text('Save'),

@@ -1,4 +1,5 @@
 import 'package:autostop/screens/change_password_screen.dart';
+import 'package:autostop/screens/map_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -48,8 +49,14 @@ class MainDrawer extends StatelessWidget {
             title: const Text('Se déconnecter'),
             onTap: () async {
               final scaffold = Scaffold.of(context);
+              final navigator = Navigator.of(context);
               await FirebaseAuth.instance.signOut();
               scaffold.closeDrawer();
+              navigator.pushAndRemoveUntil<void>(
+                MaterialPageRoute<void>(
+                    builder: (BuildContext context) => const MapScreen()),
+                ModalRoute.withName('/'),
+              );
             },
           ),
         ],

@@ -99,29 +99,32 @@ class _AuthScreenState extends State<AuthScreen> {
                       labelText: 'Confirmer le mot de passe'),
                   obscureText: true,
                 ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 8),
               Text(
                 _errorMessage,
                 style: const TextStyle(color: Colors.red),
               ),
               if (!_isRegistering)
-                ElevatedButton(
-                  onPressed: _signIn,
-                  child: const Text('Se connecter'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: _isRegistering ? _register : _signIn,
+                    child: Text(_isRegistering
+                        ? 'Valider l\'enregistrement'
+                        : 'Se connecter'),
+                  ),
                 ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _isRegistering = !_isRegistering;
-                  });
-                },
-                child: Text(_isRegistering ? 'Annuler' : 'S\'enregistrer'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isRegistering = !_isRegistering;
+                    });
+                  },
+                  child: Text(_isRegistering ? 'Annuler' : 'S\'enregistrer'),
+                ),
               ),
-              if (_isRegistering)
-                ElevatedButton(
-                  onPressed: _register,
-                  child: const Text('Valider l\'enregistrement'),
-                ),
             ],
           ),
         ),

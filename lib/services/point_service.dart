@@ -43,9 +43,9 @@ class Point {
   final double longitude;
   final String name;
   final String description;
-  final DateTime createdAt;
   final DateTime updatedAt;
   final bool approved;
+  final String creatorEmail;
 
   Point({
     this.documentId,
@@ -53,9 +53,9 @@ class Point {
     required this.longitude,
     required this.name,
     required this.description,
-    required this.createdAt,
     required this.updatedAt,
     required this.approved,
+    required this.creatorEmail,
   });
 
   factory Point.fromMap(String documentId, Map<String, dynamic> map) {
@@ -65,9 +65,9 @@ class Point {
       longitude: map['longitude'],
       name: map['name'],
       description: map['description'],
-      createdAt: map['created_at'].toDate(),
       updatedAt: map['updated_at'].toDate(),
       approved: map['approved'],
+      creatorEmail: map['creator_email'],
     );
   }
 
@@ -77,9 +77,9 @@ class Point {
       'longitude': longitude,
       'name': name,
       'description': description,
-      'created_at': createdAt,
       'updated_at': updatedAt,
       'approved': approved,
+      'creator_email': creatorEmail,
     };
   }
 }

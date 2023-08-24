@@ -103,33 +103,36 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
                     ),
                     Text(
                         "Dernière modification: il y a ${updatedDays(widget.point.updatedAt)}"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (isAuthenticated) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PointFormScreen(
-                                  point: widget.point,
+                    if (isAuthenticated &&
+                        FirebaseAuth.instance.currentUser?.email ==
+                            widget.point.creatorEmail)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (isAuthenticated) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PointFormScreen(
+                                    point: widget.point,
+                                  ),
                                 ),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AuthScreen(),
-                              ),
-                            );
-                          }
-                        },
-                        child: isAuthenticated
-                            ? const Text("Ajouter une modification")
-                            : const Text("Connectez-vous pour le modifier"),
-                      ),
-                    )
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AuthScreen(),
+                                ),
+                              );
+                            }
+                          },
+                          child: isAuthenticated
+                              ? const Text("Ajouter une modification")
+                              : const Text("Connectez-vous pour le modifier"),
+                        ),
+                      )
                   ]),
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:autostop/layouts/popup_info_point.dart';
 import 'package:autostop/layouts/popup_new_point.dart';
+import 'package:autostop/screens/auth_screen.dart';
 import 'package:autostop/services/osm_service.dart';
 import 'package:autostop/services/point_service.dart';
 import 'package:autostop/shared/main_drawer.dart';
@@ -60,6 +61,15 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AutoStop'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.login),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const AuthScreen()));
+            },
+          )
+        ],
       ),
       drawer:
           FirebaseAuth.instance.currentUser != null ? const MainDrawer() : null,
@@ -71,9 +81,9 @@ class _MapScreenState extends State<MapScreen> {
               mapController: _mapController,
               options: MapOptions(
                 center: const LatLng(46.59212, 2.46081),
-                zoom: 13,
+                zoom: 6,
                 minZoom: 1,
-                maxZoom: 1000,
+                maxZoom: 18,
                 onTap: (_, __) {
                   _popupLayerController.hideAllPopups();
                   setState(() {
@@ -165,6 +175,7 @@ class _MapScreenState extends State<MapScreen> {
                   },
                   onSelected: (City selectedCity) {
                     _mapController.move(selectedCity.pos, 13);
+                    _placeFindMarker(selectedCity);
                   },
                   optionsViewBuilder: (BuildContext context,
                       AutocompleteOnSelected<City> onSelected,
@@ -206,23 +217,12 @@ class _MapScreenState extends State<MapScreen> {
                         controller: textEditingController,
                         focusNode: focusNode,
                         onSubmitted: (selectedCity) async {
-                          City city =
+                          City? city =
                               (await _osmService.searchCities(selectedCity))
                                   .first;
-                          _mapController.move(city.pos, 13);
-                          // setState(() {
-                          //   if (_findMarker != null) {
-                          //     _markers.remove(_findMarker);
-                          //   }
-                          //   _findMarker = Marker(
-                          //     builder: (context) => const Icon(
-                          //         Icons.location_on,
-                          //         size: Point.size,
-                          //         color: Colors.blue),
-                          //     point: city.pos,
-                          //   );
-                          //   _markers.add(_findMarker!);
-                          // });
+                          if (city != null) {
+                            _placeFindMarker(city);
+                          }
                         },
                         decoration: const InputDecoration(
                           border: InputBorder.none,
@@ -266,6 +266,21 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
     );
+  }
+
+  void _placeFindMarker(City city) {
+    _mapController.move(city.pos, 13);
+    setState(() {
+      if (_selectedMarker != null) {
+        _markers.remove(_selectedMarker);
+      }
+      _selectedMarker = Marker(
+        builder: (context) =>
+            const Icon(Icons.location_on, size: Point.size, color: Colors.blue),
+        point: city.pos,
+      );
+      _markers.add(_selectedMarker!);
+    });
   }
 }
 

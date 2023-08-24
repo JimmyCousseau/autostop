@@ -2,7 +2,6 @@ import 'package:autostop/shared/star_rating.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../models/comment.dart';
 import '../services/comment_service.dart';
 
 class CommentFormScreen extends StatefulWidget {
@@ -52,29 +51,23 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
       });
     } else {
       final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
       try {
-        if (widget.userComment != null) {
-          final updatedComment = Comment(
-              documentId: widget.userComment!.documentId,
-              userMail: widget.userComment!.userMail,
-              pointId: widget.userComment!.pointId,
-              content: _commentController.text,
-              rate: _userRating.toInt(),
-              createdAt: DateTime.now(),
-              title: _titleController.text);
-          await CommentService().updateComment(updatedComment);
-        } else {
-          await CommentService().createComment(Comment(
-            pointId: widget.pointDocumentId,
-            rate: _userRating.toInt(),
-            content: _commentController.text,
-            createdAt: DateTime.now(),
-            title: _titleController.text,
-            userMail: FirebaseAuth.instance.currentUser!.email!,
-          ));
-        }
-
+        await CommentService().createComment(Comment(
+          pointId: widget.pointDocumentId,
+          rate: _userRating.toInt(),
+          content: _commentController.text,
+          updatedAt: DateTime.now(),
+          title: _titleController.text,
+          userMail: FirebaseAuth.instance.currentUser!.email!,
+          approved: false,
+        ));
         navigator.pop(); // Close the comment screen}
+        const snackBar = SnackBar(
+            duration: Duration(milliseconds: 5000),
+            content: Text(
+                'Votre commentaire sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
+        scaffoldMessenger.showSnackBar(snackBar);
       } catch (e) {
         setState(() {
           _errorMessage = "Une erreur est survenue $e";

@@ -1,7 +1,7 @@
 import 'package:autostop/shared/star_rating.dart';
 import 'package:flutter/material.dart';
 
-import '../models/comment.dart';
+import '../services/comment_service.dart';
 
 class CommentCard extends StatelessWidget {
   final Comment comment;
@@ -48,7 +48,7 @@ class CommentCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              "Commenté le ${comment.createdAt.day}/${comment.createdAt.month}/${comment.createdAt.year}",
+              "Commenté le ${comment.updatedAt.day}/${comment.updatedAt.month}/${comment.updatedAt.year}",
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,

@@ -48,9 +48,10 @@ class PopupNewPoint extends StatelessWidget {
                                 longitude: p.longitude,
                                 name: "",
                                 description: "",
-                                createdAt: DateTime.now(),
                                 updatedAt: DateTime.now(),
                                 approved: false,
+                                creatorEmail:
+                                    FirebaseAuth.instance.currentUser!.email!,
                               ),
                             ),
                           ),
