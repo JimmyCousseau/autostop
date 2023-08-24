@@ -1,0 +1,5 @@
+flutter_launcher_icons:
+  android: "launcher_icon"  # Nom de l'icône Android dans le dossier android/app/src/main/res/mipmap-*
+  ios: true  # Utilisera le chemin spécifié dans le pubspec.yaml pour iOS
+  remove_alpha_ios: true
+  image_path: "assets/app_icon.png"  # Chemin de l'icône pour iOS et pour le nom d'icône Android spécifié
