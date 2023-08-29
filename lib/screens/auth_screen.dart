@@ -1,6 +1,11 @@
+import 'package:autostop/screens/forgot_password_screen.dart';
+import 'package:autostop/screens/register_screen.dart';
+import 'package:autostop/shared/form_layer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:autostop/screens/map_screen.dart'; // Import your MapScreen
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'map_screen.dart'; // Import your MapScreen
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -10,21 +15,52 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  bool _isRegistering = false; // Track if user is registering
-  String _errorMessage = ''; // Store error message
+  late final SharedPreferences _preferences;
+
+  bool _rememberCredentials = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedCredentials();
+  }
+
+  void _loadRememberedCredentials() async {
+    _preferences = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberCredentials =
+          _preferences.getBool('rememberCredentials') ?? false;
+      if (_rememberCredentials) {
+        _emailController.text = _preferences.getString('savedEmail') ?? '';
+        _passwordController.text =
+            _preferences.getString('savedPassword') ?? '';
+      }
+    });
+  }
+
+  void _saveRememberedCredentials() {
+    _preferences.setBool('rememberCredentials', _rememberCredentials);
+    if (_rememberCredentials) {
+      _preferences.setString('savedEmail', _emailController.text.trim());
+      _preferences.setString('savedPassword', _passwordController.text);
+    } else {
+      _preferences.remove('savedEmail');
+      _preferences.remove('savedPassword');
+    }
+  }
 
   void _signIn() async {
     final navigator = Navigator.of(context);
+    final String email = _emailController.text.trim();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       final UserCredential userCredential =
           await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
+        email: email,
         password: _passwordController.text,
       );
       if (userCredential.user != null) {
@@ -32,103 +68,68 @@ class _AuthScreenState extends State<AuthScreen> {
         navigator.pushReplacement(
           MaterialPageRoute(builder: (_) => const MapScreen()),
         );
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Mot de passe ou adresse mail invalides';
-      });
-    }
-  }
-
-  void _register() async {
-    final navigator = Navigator.of(context);
-    try {
-      if (_passwordController.text == _confirmPasswordController.text) {
-        final UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(content: Text('Connecté')),
         );
-        if (userCredential.user != null) {
-          // Navigate to MapScreen after successful registration
-          navigator.pushReplacement(
-            MaterialPageRoute(builder: (_) => const MapScreen()),
-          );
-        } else {
-          setState(() {
-            _errorMessage = "Email déjà utilisée";
-          });
-        }
-      } else {
-        setState(() {
-          _errorMessage = 'Les mots de passes ne correspondent pas';
-        });
+        _saveRememberedCredentials();
       }
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Erreur: mauvais mot de passe ou email')),
+      );
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Problème lors de l\'enregistrement';
-      });
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('Erreur: ${e.toString()}')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Authentification'),
-      ),
-      body: Center(
-        child: SizedBox(
-          width: 400.0,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Mot de passe'),
-                obscureText: true,
-              ),
-              if (_isRegistering) // Conditionally show Confirm Password field
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  decoration: const InputDecoration(
-                      labelText: 'Confirmer le mot de passe'),
-                  obscureText: true,
-                ),
-              const SizedBox(height: 8),
-              Text(
-                _errorMessage,
-                style: const TextStyle(color: Colors.red),
-              ),
-              if (!_isRegistering)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: _isRegistering ? _register : _signIn,
-                    child: Text(_isRegistering
-                        ? 'Valider l\'enregistrement'
-                        : 'Se connecter'),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _isRegistering = !_isRegistering;
-                    });
-                  },
-                  child: Text(_isRegistering ? 'Annuler' : 'S\'enregistrer'),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(
+          title: const Text('Authentification'),
         ),
-      ),
-    );
+        body: FormLayer(forms: [
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
+          ),
+          TextFormField(
+            controller: _passwordController,
+            decoration: const InputDecoration(labelText: 'Mot de passe'),
+            obscureText: true,
+          ),
+          CheckboxListTile(
+            title: const Text(
+              'Se souvenir de moi',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+            value: _rememberCredentials,
+            onChanged: (value) {
+              setState(() {
+                _rememberCredentials = value!;
+              });
+            },
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
+            },
+            child: const Text("Mot de passe oublié"),
+          ),
+          ElevatedButton(
+            onPressed: _signIn,
+            child: const Text('Se connecter'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RegisterScreen()));
+            },
+            child: const Text('S\'enregistrer'),
+          ),
+        ]));
   }
 }

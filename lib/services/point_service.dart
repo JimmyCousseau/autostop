@@ -8,14 +8,6 @@ class PointService {
     await pointsCollection.add(point.toMap());
   }
 
-  Future<void> updatePoint(Point point) async {
-    await pointsCollection.doc(point.documentId).update(point.toMap());
-  }
-
-  Future<void> deletePoint(String pointId) async {
-    await pointsCollection.doc(pointId).delete();
-  }
-
   Stream<List<Point>> getApprovedPointsStream() {
     return pointsCollection.snapshots().map(
       (snapshot) {
@@ -65,7 +57,7 @@ class Point {
       longitude: map['longitude'],
       name: map['name'],
       description: map['description'],
-      updatedAt: map['updated_at'].toDate(),
+      updatedAt: (map['updated_at'] as Timestamp).toDate(),
       approved: map['approved'],
       creatorEmail: map['creator_email'],
     );

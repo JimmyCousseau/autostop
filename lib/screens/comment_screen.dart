@@ -4,14 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/comment_service.dart';
 import '../shared/comment_card.dart';
-import '../shared/star_rating.dart'; // Import your StarRating widget
 
 class CommentScreen extends StatefulWidget {
   final String pointDocumentId;
-  final StarRating starRating;
 
-  const CommentScreen(
-      {super.key, required this.pointDocumentId, required this.starRating});
+  const CommentScreen({super.key, required this.pointDocumentId});
 
   @override
   State<CommentScreen> createState() => _CommentScreenState();
@@ -59,7 +56,8 @@ class _CommentScreenState extends State<CommentScreen> {
                     ? "Écrire un nouveau commentaire"
                     : "Se connecter pour pouvoir commenter")),
             const SizedBox(height: 16),
-            const Text('Autres commentaires:', style: TextStyle(fontSize: 18)),
+            Text('Commentaires:',
+                style: Theme.of(context).textTheme.headlineSmall),
             FutureBuilder<List<Comment>>(
               future: _commentsFuture,
               builder: (context, snapshot) {
@@ -69,24 +67,20 @@ class _CommentScreenState extends State<CommentScreen> {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
                   final comments = snapshot.data!;
-                  return Column(
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: comments.length,
-                        itemBuilder: (context, index) {
-                          final comment = comments[index];
-                          if (_userComment == null &&
-                              comment.userMail ==
-                                  FirebaseAuth.instance.currentUser?.email) {
-                            _userComment = comment;
-                          }
-                          return CommentCard(
-                            comment: comment,
-                          );
-                        },
-                      ),
-                    ],
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      final comment = comments[index];
+                      if (_userComment == null &&
+                          comment.userMail ==
+                              FirebaseAuth.instance.currentUser?.email) {
+                        _userComment = comment;
+                      }
+                      return CommentCard(
+                        comment: comment,
+                      );
+                    },
                   );
                 } else {
                   return const Text('No comments available.');

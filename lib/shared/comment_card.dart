@@ -1,4 +1,3 @@
-import 'package:autostop/shared/star_rating.dart';
 import 'package:flutter/material.dart';
 
 import '../services/comment_service.dart';
@@ -14,10 +13,6 @@ class CommentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -31,29 +26,19 @@ class CommentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                StarRating(
-                  initialRating: comment.rate.toDouble(),
-                  showRate: false,
-                ),
-                Text(
-                  comment.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
+            Text(
+              comment.title,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 4),
             Text(
+              "Temps d'attente estimé: ${comment.estimatedTime.toStringAsFixed(0)} minutes",
+              softWrap: true,
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+            Text(
               "Commenté le ${comment.updatedAt.day}/${comment.updatedAt.month}/${comment.updatedAt.year}",
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
+              style: Theme.of(context).textTheme.labelSmall,
             ),
             const SizedBox(height: 8),
             Text(comment.content),

@@ -4,28 +4,30 @@ class CommentService {
   final CollectionReference commentsCollection =
       FirebaseFirestore.instance.collection('comments');
 
-  Future<Map<String, dynamic>> getCommentCountAndAverageRate(
-      String documentId) async {
-    final querySnapshot =
-        await commentsCollection.where('point_id', isEqualTo: documentId).get();
+  Future<Rate> getCommentCountAndAverageRate(String documentId) async {
+    final querySnapshot = await commentsCollection
+        .where('point_id', isEqualTo: documentId)
+        .where('approved', isEqualTo: true)
+        .get();
 
     final totalComments = querySnapshot.docs.length;
-    double totalRate = 0;
+    double totalEstimatedTime = 0;
 
     for (var doc in querySnapshot.docs) {
-      totalRate += doc['rate'];
+      totalEstimatedTime += doc['estimated_time'];
     }
-    final averageRate =
-        (totalComments > 0 && totalRate > 0) ? totalRate / totalComments : 0;
-    return {
-      'totalComments': totalComments,
-      'averageRate': averageRate,
-    };
+    final double estimatedTime = (totalComments > 0 && totalEstimatedTime >= 0)
+        ? totalEstimatedTime / totalComments
+        : 0.0;
+
+    return Rate(estimatedTime: estimatedTime, totalComments: totalComments);
   }
 
   Future<List<Comment>> getCommentsForPoint(String pointId) async {
-    final querySnapshot =
-        await commentsCollection.where('point_id', isEqualTo: pointId).get();
+    final querySnapshot = await commentsCollection
+        .where('point_id', isEqualTo: pointId)
+        .where('approved', isEqualTo: true)
+        .get();
 
     return querySnapshot.docs.map((doc) {
       if (doc.data() != null) {
@@ -47,43 +49,58 @@ class Comment {
   final String pointId;
   final String title;
   final String content;
-  final int rate;
+  final int estimatedTime;
   final DateTime updatedAt;
   final bool approved;
+  final double destLat;
+  final double destLng;
 
   Comment({
     this.documentId,
     required this.userMail,
     required this.pointId,
     required this.content,
-    required this.rate,
+    required this.estimatedTime,
     required this.updatedAt,
     required this.title,
     required this.approved,
+    required this.destLat,
+    required this.destLng,
   });
 
   factory Comment.fromMap(String documentId, Map<String, dynamic> json) {
     return Comment(
       documentId: documentId,
-      userMail: json['user_mail'],
+      userMail: json['creator_mail'],
       pointId: json['point_id'],
       content: json['content'],
-      rate: json['rate'],
-      updatedAt: DateTime.parse(json['updated_at']),
+      estimatedTime: json['estimated_time'],
+      updatedAt: (json['updated_at'] as Timestamp).toDate(),
       title: json['title'],
       approved: json['approved'],
+      destLat: json['destination_latitude'],
+      destLng: json['destination_longitude'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'user_mail': userMail,
       'point_id': pointId,
-      'content': content,
-      'rate': rate,
-      'updated_at': updatedAt.toIso8601String(),
       'title': title,
+      'content': content,
+      'estimated_time': estimatedTime,
+      'destination_latitude': destLat,
+      'destination_longitude': destLng,
+      'updated_at': updatedAt,
       'approved': approved,
+      'creator_mail': userMail,
     };
   }
+}
+
+class Rate {
+  final double estimatedTime;
+  final int totalComments;
+
+  Rate({required this.estimatedTime, required this.totalComments});
 }

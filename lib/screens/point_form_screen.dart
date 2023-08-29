@@ -1,4 +1,5 @@
 import 'package:autostop/services/point_service.dart';
+import 'package:autostop/shared/form_layer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ class _PointFormScreenState extends State<PointFormScreen> {
 
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  final _pointService = PointService();
 
   @override
   void initState() {
@@ -33,85 +35,76 @@ class _PointFormScreenState extends State<PointFormScreen> {
     super.dispose();
   }
 
+  void _sendPointForm() {
+    if (_formKey.currentState!.validate()) {
+      final name = _nameController.text;
+      final description = _descriptionController.text;
+      try {
+        _pointService.addPoint(Point(
+          documentId: widget.point.documentId,
+          latitude: widget.point.latitude,
+          longitude: widget.point.longitude,
+          name: name,
+          description: description,
+          updatedAt: DateTime.now(),
+          approved: false,
+          creatorEmail:
+              FirebaseAuth.instance.currentUser?.email ?? "ERROR CRITIQUE",
+        ));
+        Navigator.pop(context);
+        _showSnackBar(
+            'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !');
+      } catch (e) {
+        _showSnackBar('Une erreur est survenue');
+      }
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(milliseconds: 5000),
+        content: Text(message),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.point.documentId == null
-            ? 'Créer un nouveau spot'
-            : 'Modifier le spot direction ${widget.point.name}'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SizedBox(
-            width: 400.0,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _nameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Merci de compléter la direction';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(labelText: 'Direction'),
-                  ),
-                  TextFormField(
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(labelText: 'Description'),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Latitude: ${widget.point.latitude}'),
-                  Text('longitude: ${widget.point.longitude}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        final name = _nameController.text;
-                        final description = _descriptionController.text;
-                        final p = Point(
-                          latitude: widget.point.latitude,
-                          longitude: widget.point.longitude,
-                          name: name,
-                          description: description,
-                          updatedAt: DateTime.now(),
-                          approved: false,
-                          creatorEmail:
-                              FirebaseAuth.instance.currentUser?.email ??
-                                  "ERROR CRITIQUE",
-                        );
-                        try {
-                          if (p.documentId == null || p.documentId!.isEmpty) {
-                            PointService().addPoint(p);
-                          } else {
-                            PointService().updatePoint(p);
-                          }
-                          Navigator.pop(context);
-                          const snackBar = SnackBar(
-                              duration: Duration(milliseconds: 5000),
-                              content: Text(
-                                  'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !'));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        } catch (e) {
-                          const snackBar = SnackBar(
-                              duration: Duration(milliseconds: 5000),
-                              content: Text('Une erreur est survenue'));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      }
-                    },
-                    child: const Text('Save'),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        appBar: AppBar(
+          title: Text(widget.point.documentId == null
+              ? 'Créer un nouveau spot'
+              : 'Modifier le spot direction ${widget.point.name}'),
         ),
-      ),
-    );
+        body: FormLayer(forms: [
+          TextFormField(
+            controller: _nameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Merci de compléter la direction';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(labelText: 'Direction'),
+          ),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: const InputDecoration(labelText: 'Description'),
+            maxLines: null,
+            textCapitalization: TextCapitalization.sentences,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('Latitude: ${widget.point.latitude}'),
+              Text('longitude: ${widget.point.longitude}'),
+            ],
+          ),
+          ElevatedButton(
+            onPressed: _sendPointForm,
+            child: const Text('Save'),
+          ),
+        ]));
   }
 }

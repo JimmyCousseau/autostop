@@ -13,7 +13,7 @@ class OsmService {
 
     _searchDebouncer.run(() async {
       final response = await http.get(Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=5'));
+          'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=5&addressdetails=1&extratags=1&countrycodes=fr,it,de,es,gb'));
       if (response.statusCode == 200) {
         final data =
             utf8.decode(response.bodyBytes); // Decode the response body
@@ -23,13 +23,14 @@ class OsmService {
               (d) => City(
                 LatLng(double.tryParse(d['lat']) ?? 0,
                     double.tryParse(d['lon']) ?? 0),
-                utf8.decode(utf8.encode(d['display_name'])),
+                d['name'],
+                _getDisplayName(d['address']),
               ),
             )
             .toList();
         completer.complete(cities);
       } else {
-        completer.complete([City(const LatLng(49, 2.35), "France")]);
+        completer.complete([City(const LatLng(49, 2.35), "", "France")]);
       }
     });
 
@@ -37,9 +38,14 @@ class OsmService {
   }
 }
 
+String _getDisplayName(dynamic infos) {
+  return "${infos['state']}, ${infos['postcode']}, ${infos['country']}";
+}
+
 class City {
   final LatLng pos;
-  final String displayName;
+  final String name;
+  final String moreInfo;
 
-  City(this.pos, this.displayName);
+  City(this.pos, this.name, this.moreInfo);
 }

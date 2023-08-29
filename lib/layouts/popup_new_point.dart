@@ -14,26 +14,24 @@ class PopupNewPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isAuthenticated = FirebaseAuth.instance.currentUser != null;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15.0),
+    return Container(
+      constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height / 3,
+          maxWidth: MediaQuery.of(context).size.width / 2),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text(
+              Text(
                 "Ajouter",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:
-                    Text("latitude: ${p.latitude}, longitude: ${p.longitude}"),
-              ),
+              const SizedBox(height: 5),
+              Text("latitude: ${p.latitude}"),
+              Text("longitude: ${p.longitude}"),
+              const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
