@@ -34,7 +34,12 @@ class ParameterDialog extends StatelessWidget {
                 'AutoStop',
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
-              IconButton(onPressed: () {}, icon: const Icon(null)),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(null),
+                  style: const ButtonStyle(
+                      backgroundColor:
+                          MaterialStatePropertyAll(Colors.transparent),),),
             ],
           ),
           if (isConnected)

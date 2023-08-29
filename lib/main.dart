@@ -14,8 +14,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final Color primaryColor = const Color(0xFF4C72B0);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -31,6 +29,7 @@ class MyApp extends StatelessWidget {
   ThemeData _buildLightThemeData() {
     const bg = Colors.white;
     const fg = Color(0xFF202123);
+    const Color primaryColor = Color(0xFF4C72B0);
     return ThemeData(
       primaryColor: primaryColor, // Dark pastel blue
       scaffoldBackgroundColor: bg,
@@ -41,24 +40,24 @@ class MyApp extends StatelessWidget {
       textTheme: _getTextTheme().apply(bodyColor: fg, displayColor: fg),
       cardTheme: _getCardTheme(null),
       iconTheme: const IconThemeData(color: fg),
-      iconButtonTheme: IconButtonThemeData(
+      iconButtonTheme: const IconButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: const MaterialStatePropertyAll(bg),
+          foregroundColor: MaterialStatePropertyAll(bg),
           backgroundColor: MaterialStatePropertyAll(primaryColor),
         ),
       ),
-      buttonTheme: ButtonThemeData(
+      buttonTheme: const ButtonThemeData(
         buttonColor: primaryColor, // Dark pastel blue for buttons
         textTheme: ButtonTextTheme.primary,
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
+      elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: const MaterialStatePropertyAll(Colors.white),
-          textStyle: const MaterialStatePropertyAll(TextStyle(fontSize: 14)),
+          foregroundColor: MaterialStatePropertyAll(Colors.white),
+          textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),
-      checkboxTheme: CheckboxThemeData(
+      checkboxTheme: const CheckboxThemeData(
         checkColor: MaterialStatePropertyAll(primaryColor),
       ),
     );
@@ -67,36 +66,37 @@ class MyApp extends StatelessWidget {
   ThemeData _buildDarkThemeData() {
     const fg = Colors.white;
     const bg = Color(0xFF202123);
+    const Color primaryColor = Color(0xFF4C72B0);
     return ThemeData.dark().copyWith(
       primaryColor: primaryColor, // Dark pastel blue
       scaffoldBackgroundColor: bg,
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: primaryColor,
-        iconTheme: const IconThemeData(color: fg),
+        iconTheme: IconThemeData(color: fg),
       ),
       textTheme: _getTextTheme().apply(bodyColor: fg, displayColor: fg),
       cardTheme: _getCardTheme(null),
-      buttonTheme: ButtonThemeData(
+      buttonTheme: const ButtonThemeData(
         buttonColor: primaryColor, // Dark pastel blue for buttons
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
+      elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(primaryColor),
-          textStyle: const MaterialStatePropertyAll(TextStyle(fontSize: 14)),
+          textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: primaryColor,
         foregroundColor: fg,
       ),
       iconTheme: const IconThemeData(color: fg),
-      iconButtonTheme: IconButtonThemeData(
+      iconButtonTheme: const IconButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: const MaterialStatePropertyAll(fg),
+          foregroundColor: MaterialStatePropertyAll(fg),
           backgroundColor: MaterialStatePropertyAll(primaryColor),
         ),
       ),
-      checkboxTheme: CheckboxThemeData(
+      checkboxTheme: const CheckboxThemeData(
         checkColor: MaterialStatePropertyAll(primaryColor),
       ),
     );

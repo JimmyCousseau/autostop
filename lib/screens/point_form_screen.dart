@@ -91,7 +91,7 @@ class _PointFormScreenState extends State<PointFormScreen> {
           TextFormField(
             controller: _descriptionController,
             decoration: const InputDecoration(labelText: 'Description'),
-            maxLines: null,
+            maxLines: 10,
             textCapitalization: TextCapitalization.sentences,
           ),
           Column(
