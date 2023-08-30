@@ -13,8 +13,6 @@ class PointFormScreen extends StatefulWidget {
 }
 
 class _PointFormScreenState extends State<PointFormScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   final _pointService = PointService();
@@ -36,27 +34,25 @@ class _PointFormScreenState extends State<PointFormScreen> {
   }
 
   void _sendPointForm() {
-    if (_formKey.currentState!.validate()) {
-      final name = _nameController.text;
-      final description = _descriptionController.text;
-      try {
-        _pointService.addPoint(Point(
-          documentId: widget.point.documentId,
-          latitude: widget.point.latitude,
-          longitude: widget.point.longitude,
-          name: name,
-          description: description,
-          updatedAt: DateTime.now(),
-          approved: false,
-          creatorEmail:
-              FirebaseAuth.instance.currentUser?.email ?? "ERROR CRITIQUE",
-        ));
-        Navigator.pop(context);
-        _showSnackBar(
-            'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !');
-      } catch (e) {
-        _showSnackBar('Une erreur est survenue');
-      }
+    final name = _nameController.text.trim();
+    final description = _descriptionController.text.trim();
+    try {
+      _pointService.addPoint(Point(
+        documentId: widget.point.documentId,
+        latitude: widget.point.latitude,
+        longitude: widget.point.longitude,
+        name: name,
+        description: description,
+        updatedAt: DateTime.now(),
+        approved: false,
+        creatorEmail:
+            FirebaseAuth.instance.currentUser?.email ?? "CRITIC ERROR",
+      ));
+      Navigator.pop(context);
+      _showSnackBar(
+          'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !');
+    } catch (e) {
+      _showSnackBar('Une erreur est survenue');
     }
   }
 
@@ -72,39 +68,40 @@ class _PointFormScreenState extends State<PointFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.point.documentId == null
-              ? 'Créer un nouveau spot'
-              : 'Modifier le spot direction ${widget.point.name}'),
+      appBar: AppBar(
+        title: Text(widget.point.documentId == null
+            ? 'Créer un nouveau spot'
+            : 'Modifier le spot direction ${widget.point.name}'),
+      ),
+      body: FormLayer(forms: [
+        TextFormField(
+          controller: _nameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Merci de compléter la direction';
+            }
+            return null;
+          },
+          decoration: const InputDecoration(labelText: 'Direction'),
         ),
-        body: FormLayer(forms: [
-          TextFormField(
-            controller: _nameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Merci de compléter la direction';
-              }
-              return null;
-            },
-            decoration: const InputDecoration(labelText: 'Direction'),
-          ),
-          TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(labelText: 'Description'),
-            maxLines: 10,
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('Latitude: ${widget.point.latitude}'),
-              Text('longitude: ${widget.point.longitude}'),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: _sendPointForm,
-            child: const Text('Save'),
-          ),
-        ]));
+        TextFormField(
+          controller: _descriptionController,
+          decoration: const InputDecoration(labelText: 'Description'),
+          maxLines: 10,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('Latitude: ${widget.point.latitude}'),
+            Text('longitude: ${widget.point.longitude}'),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: _sendPointForm,
+          child: const Text('Save'),
+        ),
+      ]),
+    );
   }
 }

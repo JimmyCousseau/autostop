@@ -1,4 +1,5 @@
 import 'package:autostop/shared/parameter_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/osm_service.dart';
@@ -43,7 +44,8 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
                 if (textEditingValue.text.isEmpty) {
                   return [];
                 }
-                return _osmService.searchCities(textEditingValue.text);
+                final sanitizedInput = _sanitizeText(textEditingValue.text);
+                return _osmService.searchCities(sanitizedInput);
               },
               onSelected: widget.onSelected,
               optionsViewBuilder: (BuildContext context,
@@ -84,8 +86,17 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
           focusNode: focusNode,
           onSubmitted: (selectedCity) async {
             // Throws an error
-            City city = (await _osmService.searchCities(selectedCity)).first;
-            widget.onSelected(city);
+
+            try {
+              City city = (await _osmService.searchCities(selectedCity)).first;
+              widget.onSelected(city);
+            } on StateError catch (_) {
+              // Search gave an empty response
+            } catch (e) {
+              if (kDebugMode) {
+                print(e);
+              }
+            }
           },
           onTapOutside: (pointer) {
             focusNode.unfocus();
@@ -147,5 +158,31 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
       );
     }
     return const Text("");
+  }
+
+  String _sanitizeText(String input) {
+    final sanitizedInput = input.trim();
+
+    // Validate the length of the input
+    if (sanitizedInput.length > 50) {
+      showDialog(
+        context: context,
+        builder: (_) => const Text("La recherche est trop longue"),
+      );
+    }
+    // Define a map of characters and their corresponding HTML entities
+    final htmlEntities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '/': '&#x2F;',
+    };
+
+    // Replace characters with their HTML entities
+    return sanitizedInput.replaceAllMapped(RegExp('[&<>"\'/]'), (match) {
+      return htmlEntities[match.group(0)]!;
+    });
   }
 }

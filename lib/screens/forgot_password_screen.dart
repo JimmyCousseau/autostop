@@ -18,7 +18,7 @@ class ForgotPasswordScreen extends StatelessWidget {
         );
       } catch (e) {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Erreur : ${e.toString()}')),
+          const SnackBar(content: Text('Erreur lors de la réinitialisation')),
         );
       }
     } else {

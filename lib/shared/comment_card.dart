@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../services/comment_service.dart';
 
 class CommentCard extends StatelessWidget {
@@ -22,7 +21,7 @@ class CommentCard extends StatelessWidget {
               children: [
                 const Icon(Icons.person),
                 const SizedBox(width: 8),
-                Text(comment.userMail),
+                Text(_sanitizeText(comment.userMail)),
               ],
             ),
             const SizedBox(height: 8),
@@ -37,7 +36,7 @@ class CommentCard extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
             Text(
-              "Commenté le ${comment.updatedAt.day}/${comment.updatedAt.month}/${comment.updatedAt.year}",
+              "Commenté le ${_formatDate(comment.updatedAt)}",
               style: Theme.of(context).textTheme.labelSmall,
             ),
             const SizedBox(height: 8),
@@ -46,5 +45,28 @@ class CommentCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _sanitizeText(String input) {
+    final sanitizedInput = input.trim();
+
+    // Define a map of characters and their corresponding HTML entities
+    final htmlEntities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '/': '&#x2F;',
+    };
+
+    // Replace characters with their HTML entities
+    return sanitizedInput.replaceAllMapped(RegExp('[&<>"\'/]'), (match) {
+      return htmlEntities[match.group(0)]!;
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
   }
 }

@@ -47,9 +47,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
             content: Text('Les mots de passes ne correspondent pas')));
       }
     } catch (e) {
-      scaffoldMessenger
-          .showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content:
+              Text('Erreur: une erreur est survenu lors de l\'enregistrement'),
+        ),
+      );
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -62,6 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         TextFormField(
           controller: _emailController,
           decoration: const InputDecoration(labelText: 'Email'),
+          keyboardType: TextInputType.emailAddress,
         ),
         TextFormField(
           controller: _passwordController,

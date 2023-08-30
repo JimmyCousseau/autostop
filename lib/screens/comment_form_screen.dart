@@ -67,9 +67,9 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
           Comment(
             pointId: widget.pointDocumentId,
             estimatedTime: _userRating.toInt(),
-            content: _commentController.text,
+            content: _commentController.text.trim(),
             updatedAt: DateTime.now(),
-            title: _titleController.text,
+            title: _titleController.text.trim(),
             userMail: FirebaseAuth.instance.currentUser!.email!,
             approved: false,
             destLat: point.latitude,
@@ -92,7 +92,7 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
       ScaffoldMessengerState scaffoldMessengerState, String message) {
     scaffoldMessengerState.showSnackBar(
       SnackBar(
-        duration: const Duration(milliseconds: 5000),
+        duration: const Duration(seconds: 5),
         content: Text(message),
       ),
     );

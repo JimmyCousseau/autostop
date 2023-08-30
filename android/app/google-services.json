@@ -1,0 +1,119 @@
+{
+  "project_info": {
+    "project_number": "336514695273",
+    "firebase_url": "https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "autostop-acf5d",
+    "storage_bucket": "autostop-acf5d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336514695273:android:8feca309439628970a22f8",
+        "android_client_info": {
+          "package_name": "com.cousseaujimmy.autostop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336514695273-kh8vp90chnnhkpi1a0qsdbt4io09asoe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjgQwhgaJd03RjPuqI31hZIknSVFncIN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336514695273-8gn2bficmjialtvo8jdq74fr8oqvb8nn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "336514695273-9e8nioibjlfckotasjobcg8i05kos9od.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.autostopAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336514695273:android:80bcd5251a22a6ec0a22f8",
+        "android_client_info": {
+          "package_name": "com.example.autostop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336514695273-kh8vp90chnnhkpi1a0qsdbt4io09asoe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjgQwhgaJd03RjPuqI31hZIknSVFncIN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336514695273-8gn2bficmjialtvo8jdq74fr8oqvb8nn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "336514695273-9e8nioibjlfckotasjobcg8i05kos9od.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.autostopAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336514695273:android:286ff74a3f65067f0a22f8",
+        "android_client_info": {
+          "package_name": "com.example.autostop_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336514695273-kh8vp90chnnhkpi1a0qsdbt4io09asoe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjgQwhgaJd03RjPuqI31hZIknSVFncIN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336514695273-8gn2bficmjialtvo8jdq74fr8oqvb8nn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "336514695273-9e8nioibjlfckotasjobcg8i05kos9od.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.autostopAdmin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

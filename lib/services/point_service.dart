@@ -53,13 +53,13 @@ class Point {
   factory Point.fromMap(String documentId, Map<String, dynamic> map) {
     return Point(
       documentId: documentId,
-      latitude: map['latitude'],
-      longitude: map['longitude'],
-      name: map['name'],
-      description: map['description'],
-      updatedAt: (map['updated_at'] as Timestamp).toDate(),
-      approved: map['approved'],
-      creatorEmail: map['creator_email'],
+      latitude: map['latitude'] ?? 0.0,
+      longitude: map['longitude'] ?? 0.0,
+      name: map['name'] ?? "",
+      description: map['description'] ?? "",
+      updatedAt: ((map['updated_at'] ?? DateTime.now()) as Timestamp).toDate(),
+      approved: map['approved'] ?? false,
+      creatorEmail: map['creator_email'] ?? "",
     );
   }
 

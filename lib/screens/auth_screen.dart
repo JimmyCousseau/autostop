@@ -86,50 +86,51 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Authentification'),
+      appBar: AppBar(
+        title: const Text('Authentification'),
+      ),
+      body: FormLayer(forms: [
+        TextFormField(
+          keyboardType: TextInputType.emailAddress,
+          controller: _emailController,
+          decoration: const InputDecoration(labelText: 'Email'),
         ),
-        body: FormLayer(forms: [
-          TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
+        TextFormField(
+          controller: _passwordController,
+          decoration: const InputDecoration(labelText: 'Mot de passe'),
+          obscureText: true,
+        ),
+        CheckboxListTile(
+          title: const Text(
+            'Se souvenir de moi',
+            style: TextStyle(fontWeight: FontWeight.normal),
           ),
-          TextFormField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Mot de passe'),
-            obscureText: true,
-          ),
-          CheckboxListTile(
-            title: const Text(
-              'Se souvenir de moi',
-              style: TextStyle(fontWeight: FontWeight.normal),
-            ),
-            value: _rememberCredentials,
-            onChanged: (value) {
-              setState(() {
-                _rememberCredentials = value!;
-              });
-            },
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
-            },
-            child: const Text("Mot de passe oublié"),
-          ),
-          ElevatedButton(
-            onPressed: _signIn,
-            child: const Text('Se connecter'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const RegisterScreen()));
-            },
-            child: const Text('S\'enregistrer'),
-          ),
-        ]));
+          value: _rememberCredentials,
+          onChanged: (value) {
+            setState(() {
+              _rememberCredentials = value!;
+            });
+          },
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
+          },
+          child: const Text("Mot de passe oublié"),
+        ),
+        ElevatedButton(
+          onPressed: _signIn,
+          child: const Text('Se connecter'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const RegisterScreen()));
+          },
+          child: const Text('S\'enregistrer'),
+        ),
+      ]),
+    );
   }
 }

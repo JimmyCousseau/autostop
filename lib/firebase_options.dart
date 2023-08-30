@@ -56,7 +56,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDjgQwhgaJd03RjPuqI31hZIknSVFncIN0',
-    appId: '1:336514695273:android:80bcd5251a22a6ec0a22f8',
+    appId: '1:336514695273:android:8feca309439628970a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
     databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
@@ -65,23 +65,23 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB-e7ixfjtkebGqIJpqJOzUvI9vUJgqEGg',
-    appId: '1:336514695273:ios:f3fbb16ae81326eb0a22f8',
+    appId: '1:336514695273:ios:7886068dc77eaf5b0a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
     databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
-    iosClientId: '336514695273-v5pmh1rr1sjql906h0ksf9nvbfrdcfho.apps.googleusercontent.com',
-    iosBundleId: 'com.example.autostop',
+    iosClientId: '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
+    iosBundleId: 'com.cousseaujimmy.autostop',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyB-e7ixfjtkebGqIJpqJOzUvI9vUJgqEGg',
-    appId: '1:336514695273:ios:f3fbb16ae81326eb0a22f8',
+    appId: '1:336514695273:ios:7886068dc77eaf5b0a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
     databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
-    iosClientId: '336514695273-v5pmh1rr1sjql906h0ksf9nvbfrdcfho.apps.googleusercontent.com',
-    iosBundleId: 'com.example.autostop',
+    iosClientId: '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
+    iosBundleId: 'com.cousseaujimmy.autostop',
   );
 }

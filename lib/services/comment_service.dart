@@ -71,15 +71,15 @@ class Comment {
   factory Comment.fromMap(String documentId, Map<String, dynamic> json) {
     return Comment(
       documentId: documentId,
-      userMail: json['creator_mail'],
-      pointId: json['point_id'],
-      content: json['content'],
-      estimatedTime: json['estimated_time'],
+      userMail: json['creator_mail'] ?? "",
+      pointId: json['point_id'] ?? "",
+      content: json['content'] ?? "",
+      estimatedTime: json['estimated_time'] ?? 0,
       updatedAt: (json['updated_at'] as Timestamp).toDate(),
-      title: json['title'],
-      approved: json['approved'],
-      destLat: json['destination_latitude'],
-      destLng: json['destination_longitude'],
+      title: json['title'] ?? "",
+      approved: json['approved'] ?? false,
+      destLat: json['destination_latitude'] ?? 0.0,
+      destLng: json['destination_longitude'] ?? 0.0,
     );
   }
 

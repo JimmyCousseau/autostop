@@ -35,11 +35,12 @@ class ParameterDialog extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               IconButton(
-                  onPressed: () {},
-                  icon: const Icon(null),
-                  style: const ButtonStyle(
-                      backgroundColor:
-                          MaterialStatePropertyAll(Colors.transparent),),),
+                onPressed: () {},
+                icon: const Icon(null),
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+                ),
+              ),
             ],
           ),
           if (isConnected)
@@ -79,6 +80,7 @@ class ParameterDialog extends StatelessWidget {
                     icon: Icons.logout,
                     onPressed: () {
                       showDialog(
+                        barrierDismissible: false,
                         context: context,
                         builder: ((context) {
                           return AlertDialog(
