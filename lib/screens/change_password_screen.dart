@@ -1,6 +1,7 @@
 import 'package:autostop/screens/map_screen.dart';
 import 'package:autostop/shared/form_layer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -36,6 +37,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         navigator.push(MaterialPageRoute(builder: (_) => const MapScreen()));
       }
     } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
       _showErrorMessage("Une erreur est survenue");
     }
   }

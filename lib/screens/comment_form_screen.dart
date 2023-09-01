@@ -1,6 +1,7 @@
 import 'package:autostop/shared/form_layer.dart';
 import 'package:autostop/shared/search_bar_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -83,6 +84,9 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
           'Votre commentaire sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !',
         );
       } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
         _showMessage(scaffoldMessenger, "Une erreur est survenue : $e");
       }
     }

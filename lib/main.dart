@@ -1,4 +1,5 @@
 import 'package:autostop/firebase_options.dart';
+import 'package:autostop/screens/account_deletion_screen.dart';
 import 'package:autostop/screens/map_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,9 @@ class MyApp extends StatelessWidget {
       theme: _buildLightThemeData(),
       darkTheme: _buildDarkThemeData(),
       home: const MapScreen(),
+      routes: {
+        '/delete-account': (context) => const AccountDeletionPage(),
+      },
     );
   }
 

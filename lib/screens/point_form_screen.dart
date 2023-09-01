@@ -1,6 +1,7 @@
 import 'package:autostop/services/point_service.dart';
 import 'package:autostop/shared/form_layer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PointFormScreen extends StatefulWidget {
@@ -52,6 +53,9 @@ class _PointFormScreenState extends State<PointFormScreen> {
       _showSnackBar(
           'Votre spot sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !');
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       _showSnackBar('Une erreur est survenue');
     }
   }

@@ -5,7 +5,7 @@ class PointService {
       FirebaseFirestore.instance.collection('points');
 
   Future<void> addPoint(Point point) async {
-    await pointsCollection.add(point.toMap());
+    await pointsCollection.add(point.toJson());
   }
 
   Stream<List<Point>> getApprovedPointsStream() {
@@ -14,7 +14,7 @@ class PointService {
         return snapshot.docs
             .map((doc) {
               if (doc.data() != null) {
-                return Point.fromMap(
+                return Point.fromJson(
                     doc.id, doc.data() as Map<String, dynamic>);
               } else {
                 throw Exception("Document data is null");
@@ -50,7 +50,7 @@ class Point {
     required this.creatorEmail,
   });
 
-  factory Point.fromMap(String documentId, Map<String, dynamic> map) {
+  factory Point.fromJson(String documentId, Map<String, dynamic> map) {
     return Point(
       documentId: documentId,
       latitude: map['latitude'] ?? 0.0,
@@ -63,7 +63,7 @@ class Point {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'latitude': latitude,
       'longitude': longitude,

@@ -1,14 +1,14 @@
 import 'package:autostop/screens/auth_screen.dart';
+import 'package:autostop/screens/profil_screen.dart';
+import 'package:autostop/services/user_service.dart';
 import 'package:autostop/shared/btn_icon_txt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/map_screen.dart';
-
 class ParameterDialog extends StatelessWidget {
   ParameterDialog({super.key});
 
-  final User? currentUser = FirebaseAuth.instance.currentUser;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -70,49 +70,19 @@ class ParameterDialog extends StatelessWidget {
                   ),
                 if (isConnected)
                   BtnIconText(
-                    text: "Changer son mot de passe",
-                    icon: Icons.password,
-                    onPressed: () {},
+                    text: "Mon profil",
+                    icon: Icons.account_circle,
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => const ProfilScreen()));
+                    },
                   ),
                 if (isConnected)
                   BtnIconText(
                     text: "Se déconnecter",
                     icon: Icons.logout,
                     onPressed: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: ((context) {
-                          return AlertDialog(
-                            title: const Text("Se déconnecter"),
-                            content: const Text(
-                              "Êtes-vous sûr ? \n Vous ne pourrez plus laisser de commentaires \nou bien ajouter de nouveaux spots.",
-                            ),
-                            actions: [
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    final scaffold = Scaffold.of(context);
-                                    final navigator = Navigator.of(context);
-                                    await FirebaseAuth.instance.signOut();
-                                    scaffold.closeDrawer();
-                                    navigator.pushAndRemoveUntil<void>(
-                                      MaterialPageRoute<void>(
-                                          builder: (BuildContext context) =>
-                                              const MapScreen()),
-                                      ModalRoute.withName('/'),
-                                    );
-                                  },
-                                  child: const Text("Se déconnecter")),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("retour"),
-                              )
-                            ],
-                          );
-                        }),
-                      );
+                      UserService().logout(context);
                     },
                   )
               ],

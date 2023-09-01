@@ -17,11 +17,11 @@ class CommentCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.person),
-                const SizedBox(width: 8),
-                Text(_sanitizeText(comment.userMail)),
+                Icon(Icons.person),
+                SizedBox(width: 8),
+                Text(""),
               ],
             ),
             const SizedBox(height: 8),
@@ -45,25 +45,6 @@ class CommentCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _sanitizeText(String input) {
-    final sanitizedInput = input.trim();
-
-    // Define a map of characters and their corresponding HTML entities
-    final htmlEntities = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#x27;',
-      '/': '&#x2F;',
-    };
-
-    // Replace characters with their HTML entities
-    return sanitizedInput.replaceAllMapped(RegExp('[&<>"\'/]'), (match) {
-      return htmlEntities[match.group(0)]!;
-    });
   }
 
   String _formatDate(DateTime date) {

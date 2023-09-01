@@ -31,7 +31,7 @@ class CommentService {
 
     return querySnapshot.docs.map((doc) {
       if (doc.data() != null) {
-        return Comment.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        return Comment.fromJson(doc.id, doc.data() as Map<String, dynamic>);
       } else {
         throw Exception("Document data is null");
       }
@@ -39,7 +39,7 @@ class CommentService {
   }
 
   Future<void> createComment(Comment comment) async {
-    await commentsCollection.add(comment.toMap());
+    await commentsCollection.add(comment.toJson());
   }
 }
 
@@ -68,7 +68,7 @@ class Comment {
     required this.destLng,
   });
 
-  factory Comment.fromMap(String documentId, Map<String, dynamic> json) {
+  factory Comment.fromJson(String documentId, Map<String, dynamic> json) {
     return Comment(
       documentId: documentId,
       userMail: json['creator_mail'] ?? "",
@@ -83,7 +83,7 @@ class Comment {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'point_id': pointId,
       'title': title,

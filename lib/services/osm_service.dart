@@ -18,16 +18,8 @@ class OsmService {
         final data =
             utf8.decode(response.bodyBytes); // Decode the response body
         final jsonData = json.decode(data);
-        final cities = (jsonData as List)
-            .map<City>(
-              (d) => City(
-                LatLng(double.tryParse(d['lat']) ?? 0,
-                    double.tryParse(d['lon']) ?? 0),
-                d['name'],
-                _getDisplayName(d['address']),
-              ),
-            )
-            .toList();
+        final cities =
+            (jsonData as List).map<City>((d) => City.fromJson(d)).toList();
         completer.complete(cities);
       } else {
         completer.complete([]);
@@ -38,14 +30,23 @@ class OsmService {
   }
 }
 
-String _getDisplayName(dynamic infos) {
-  return "${infos['state']}, ${infos['postcode']}, ${infos['country']}";
-}
-
 class City {
   final LatLng pos;
   final String name;
   final String moreInfo;
 
   City(this.pos, this.name, this.moreInfo);
+
+  factory City.fromJson(Map<String, dynamic> json) {
+    String getDisplayName(dynamic infos) {
+      return "${infos['state']}, ${infos['postcode']}, ${infos['country']}";
+    }
+
+    return City(
+      LatLng(
+          double.tryParse(json['lat']) ?? 0, double.tryParse(json['lon']) ?? 0),
+      json['name'],
+      getDisplayName(json['address']),
+    );
+  }
 }
