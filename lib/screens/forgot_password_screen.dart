@@ -33,16 +33,18 @@ class ForgotPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Réinitialisation du mot de passe')),
-      body: FormLayer(forms: [
-        TextField(
-          controller: _emailController,
-          decoration: const InputDecoration(labelText: 'Adresse e-mail'),
-        ),
-        ElevatedButton(
-          onPressed: () => _resetPassword(context),
-          child: const Text('Réinitialiser le mot de passe'),
-        ),
-      ]),
+      body: SingleChildScrollView(
+        child: FormLayer(forms: [
+          TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Adresse e-mail'),
+          ),
+          ElevatedButton(
+            onPressed: () => _resetPassword(context),
+            child: const Text('Réinitialiser le mot de passe'),
+          ),
+        ]),
+      ),
     );
   }
 }

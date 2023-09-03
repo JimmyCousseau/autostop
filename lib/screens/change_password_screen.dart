@@ -69,59 +69,62 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         appBar: AppBar(
           title: const Text('Changer son mot de passe'),
         ),
-        body: FormLayer(forms: [
-          TextFormField(
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Mot de passe actuel'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Merci d\'entrer son mot de passe.';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                _currentPassword = value;
-              });
-            },
-          ),
-          TextFormField(
-            obscureText: true,
-            decoration:
-                const InputDecoration(labelText: 'Nouveau mot de passe'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Merci d\'entrer un nouveau mot de passe.';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                _newPassword = value;
-              });
-            },
-          ),
-          TextFormField(
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Répèter'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Merci de saisir de nouveau le mot de passe";
-              } else if (value != _newPassword) {
-                return 'Les mots de passes ne sont pas pareils';
-              }
-              return null;
-            },
-          ),
-          ElevatedButton(
-            onPressed: _changePassword,
-            child: const Text('Changer son mot de passe'),
-          ),
-          if (_errorMessage.isNotEmpty)
-            Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.red),
+        body: SingleChildScrollView(
+          child: FormLayer(forms: [
+            TextFormField(
+              obscureText: true,
+              decoration:
+                  const InputDecoration(labelText: 'Mot de passe actuel'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Merci d\'entrer son mot de passe.';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  _currentPassword = value;
+                });
+              },
             ),
-        ]));
+            TextFormField(
+              obscureText: true,
+              decoration:
+                  const InputDecoration(labelText: 'Nouveau mot de passe'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Merci d\'entrer un nouveau mot de passe.';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  _newPassword = value;
+                });
+              },
+            ),
+            TextFormField(
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Répèter'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Merci de saisir de nouveau le mot de passe";
+                } else if (value != _newPassword) {
+                  return 'Les mots de passes ne sont pas pareils';
+                }
+                return null;
+              },
+            ),
+            ElevatedButton(
+              onPressed: _changePassword,
+              child: const Text('Changer son mot de passe'),
+            ),
+            if (_errorMessage.isNotEmpty)
+              Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.red),
+              ),
+          ]),
+        ));
   }
 }

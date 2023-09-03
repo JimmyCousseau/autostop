@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
       elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: MaterialStatePropertyAll(Colors.white),
+          foregroundColor: MaterialStatePropertyAll(bg),
           textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),
@@ -86,6 +86,7 @@ class MyApp extends StatelessWidget {
       elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(primaryColor),
+          foregroundColor: MaterialStatePropertyAll(fg),
           textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),

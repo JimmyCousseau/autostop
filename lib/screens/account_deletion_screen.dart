@@ -57,12 +57,14 @@ class _AccountDeletionPageState extends State<AccountDeletionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          children: [
-            const CircularProgressIndicator(),
-            Text("Suppression du compte",
-                style: Theme.of(context).textTheme.displayLarge),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const CircularProgressIndicator(),
+              Text("Suppression du compte",
+                  style: Theme.of(context).textTheme.displayLarge),
+            ],
+          ),
         ),
       ),
     );

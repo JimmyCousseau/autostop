@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:autostop/layouts/popup_info_point.dart';
 import 'package:autostop/layouts/popup_new_point.dart';
+import 'package:autostop/models/map_preferences.dart';
 import 'package:autostop/services/osm_service.dart';
 import 'package:autostop/services/point_service.dart';
 import 'package:autostop/shared/search_bar_dialog.dart';
@@ -22,7 +25,7 @@ class _MapScreenState extends State<MapScreen> {
   final MapController _mapController = MapController();
   final PopupController _popupLayerController = PopupController();
 
-  late final SharedPreferences _preferences;
+  late MapPreferences _mapPreferences;
 
   final double _minZoom = 2.0;
   final double _maxZoom = 18.0;
@@ -71,7 +74,6 @@ class _MapScreenState extends State<MapScreen> {
       );
       _mapController.move(LatLng(position.latitude, position.longitude), 15);
     } else {
-      // Demandez la permission si elle n'est pas accordée
       _requestPermission();
     }
   }
@@ -79,7 +81,8 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    _loadRememberedSelectedMarker();
+    _mapPreferences = MapPreferences();
+    _loadMapLastState();
     _checkPermission();
   }
 
@@ -87,24 +90,31 @@ class _MapScreenState extends State<MapScreen> {
   void dispose() {
     _popupLayerController.dispose();
     _mapController.dispose();
-    _saveRememberedSelectedMarker(_selectedMarker!.point);
+    _saveMapState();
     super.dispose();
   }
 
-  void _loadRememberedSelectedMarker() async {
-    _preferences = await SharedPreferences.getInstance();
+  void _loadMapLastState() async {
+    final preferences = await SharedPreferences.getInstance();
+    final preferencesJson = preferences.getString('mapPreferences');
     setState(() {
-      double? lat = _preferences.getDouble('selectedMarkerLat');
-      double? lng = _preferences.getDouble('selectedMarkerLng');
-      if (lat != null && lng != null) {
-        _selectedMarker = _getSelectedMarker(LatLng(lat, lng));
+      if (preferencesJson != null) {
+        _mapPreferences = MapPreferences.fromJson(jsonDecode(preferencesJson));
+        _selectedMarker = _getSelectedMarker(_mapPreferences.selectedMarker!);
       }
     });
   }
 
-  void _saveRememberedSelectedMarker(LatLng point) {
-    _preferences.setDouble('selectedMarkerLat', point.latitude);
-    _preferences.setDouble('selectedMarkerLng', point.longitude);
+  void _saveMapState() async {
+    _mapPreferences = MapPreferences(
+      selectedMarker: _selectedMarker!.point,
+      currentPosition: _mapController.center,
+      currentPositionZoom: _mapController.zoom,
+    );
+
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(
+        'mapPreferences', json.encode(_mapPreferences.toJson()));
   }
 
   @override
@@ -126,8 +136,9 @@ class _MapScreenState extends State<MapScreen> {
       child: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          center: const LatLng(46.59212, 2.46081),
-          zoom: 6,
+          center: _mapPreferences.currentPosition ??
+              const LatLng(46.59212, 2.46081),
+          zoom: _mapPreferences.currentPositionZoom ?? 6,
           minZoom: _minZoom,
           maxZoom: _maxZoom,
           rotationWinGestures: MultiFingerGesture.pinchZoom,
@@ -196,18 +207,21 @@ class _MapScreenState extends State<MapScreen> {
           FloatingActionButton(
             heroTag: 'detectLoc',
             onPressed: _detectAndZoomToLocation,
+            tooltip: 'Détecter ma position',
             child: const Icon(Icons.my_location),
           ),
           const SizedBox(height: 8),
           FloatingActionButton(
             heroTag: 'zoomIn',
             onPressed: _zoomIn,
+            tooltip: 'Zoom avant',
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 8),
           FloatingActionButton(
             heroTag: 'zoomOut',
             onPressed: _zoomOut,
+            tooltip: 'Zoom arrière',
             child: const Icon(Icons.remove),
           ),
         ],

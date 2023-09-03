@@ -14,12 +14,12 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
+    flutterVersionCode = '2'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    flutterVersionName = '1.0.1'
 }
 
 def keystoreProperties = new Properties()
@@ -51,11 +51,10 @@ android {
         applicationId "com.cousseaujimmy.autostop"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion = 30
+        minSdkVersion = 19
         targetSdk = 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -75,8 +74,4 @@ android {
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    implementation("androidx.multidex:multidex:2.0.1")
 }

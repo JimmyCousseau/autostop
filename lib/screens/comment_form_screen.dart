@@ -108,83 +108,86 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
         appBar: AppBar(
           title: const Text("Nouveau commentaire"),
         ),
-        body: FormLayer(forms: [
-          TextFormField(
-            keyboardType: const TextInputType.numberWithOptions(
-              signed: false,
-              decimal: true,
-            ),
-            controller: _estimatedTimeController,
-            decoration: const InputDecoration(
-                labelText: 'Temps d\'attente estimé (minute)'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Merci de compléter le temps d'attente estimé";
-              }
-              final val = double.tryParse(value);
-              if (val!.isNaN || val.isNegative) {
-                return "Merci de mettre un nombre valide et non négatif";
-              }
-              return null;
-            },
-          ),
-          Text("Destination", style: Theme.of(context).textTheme.titleLarge),
-          if (_destCity == null)
-            SearchBarDialog(
-              onSelected: (city) {
-                setState(() {
-                  _destCity = city;
-                });
+        body: SingleChildScrollView(
+          child: FormLayer(forms: [
+            TextFormField(
+              keyboardType: const TextInputType.numberWithOptions(
+                signed: false,
+                decimal: true,
+              ),
+              controller: _estimatedTimeController,
+              decoration: const InputDecoration(
+                  labelText: 'Temps d\'attente estimé (minute)'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Merci de compléter le temps d'attente estimé";
+                }
+                final val = double.tryParse(value);
+                if (val!.isNaN || val.isNegative) {
+                  return "Merci de mettre un nombre valide et non négatif";
+                }
+                return null;
               },
-              showParameterIcon: false,
             ),
-          if (_destCity != null)
-            Row(children: [
-              Text(_destCity!.name),
-              IconButton(
-                onPressed: () {
+            Text("Destination", style: Theme.of(context).textTheme.titleLarge),
+            if (_destCity == null)
+              SearchBarDialog(
+                onSelected: (city) {
                   setState(() {
-                    _destCity = null;
+                    _destCity = city;
                   });
                 },
-                icon: const Icon(Icons.delete),
-              )
-            ]),
-          TextFormField(
-            keyboardType: TextInputType.text,
-            controller: _titleController,
-            decoration: const InputDecoration(
-              labelText: 'Titre',
+                showParameterIcon: false,
+              ),
+            if (_destCity != null)
+              Row(children: [
+                Text(_destCity!.name),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _destCity = null;
+                    });
+                  },
+                  icon: const Icon(Icons.delete),
+                )
+              ]),
+            TextFormField(
+              keyboardType: TextInputType.text,
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Titre',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Merci de complèter le titre";
+                } else if (value.length > 200) {
+                  return "Le titre ne doit pas excèder 200 caractères";
+                }
+                return null;
+              },
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Merci de complèter le titre";
-              } else if (value.length > 200) {
-                return "Le titre ne doit pas excèder 200 caractères";
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            keyboardType: TextInputType.text,
-            controller: _commentController,
-            decoration: const InputDecoration(
-              labelText: 'Commentaire',
+            TextFormField(
+              keyboardType: TextInputType.text,
+              controller: _commentController,
+              decoration: const InputDecoration(
+                labelText: 'Commentaire',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Merci de complèter le champs commentaire";
+                } else if (value.length > 2000) {
+                  return "Le commentaire ne doit pas excèder 2000 caractères";
+                }
+                return null;
+              },
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: null,
+              autocorrect: true,
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Merci de complèter le champs commentaire";
-              } else if (value.length > 2000) {
-                return "Le commentaire ne doit pas excèder 2000 caractères";
-              }
-              return null;
-            },
-            textCapitalization: TextCapitalization.sentences,
-            maxLines: null,
-            autocorrect: true,
-          ),
-          ElevatedButton(
-              onPressed: _validateAndSendComment, child: const Text("Envoyer")),
-        ]));
+            ElevatedButton(
+                onPressed: _validateAndSendComment,
+                child: const Text("Envoyer")),
+          ]),
+        ));
   }
 }

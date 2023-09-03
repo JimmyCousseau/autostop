@@ -77,35 +77,37 @@ class _PointFormScreenState extends State<PointFormScreen> {
             ? 'Créer un nouveau spot'
             : 'Modifier le spot direction ${widget.point.name}'),
       ),
-      body: FormLayer(forms: [
-        TextFormField(
-          controller: _nameController,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Merci de compléter la direction';
-            }
-            return null;
-          },
-          decoration: const InputDecoration(labelText: 'Direction'),
-        ),
-        TextFormField(
-          controller: _descriptionController,
-          decoration: const InputDecoration(labelText: 'Description'),
-          maxLines: 10,
-          textCapitalization: TextCapitalization.sentences,
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text('Latitude: ${widget.point.latitude}'),
-            Text('longitude: ${widget.point.longitude}'),
-          ],
-        ),
-        ElevatedButton(
-          onPressed: _sendPointForm,
-          child: const Text('Save'),
-        ),
-      ]),
+      body: SingleChildScrollView(
+        child: FormLayer(forms: [
+          TextFormField(
+            controller: _nameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Merci de compléter la direction';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(labelText: 'Direction'),
+          ),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: const InputDecoration(labelText: 'Description'),
+            maxLines: 10,
+            textCapitalization: TextCapitalization.sentences,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('Latitude: ${widget.point.latitude}'),
+              Text('longitude: ${widget.point.longitude}'),
+            ],
+          ),
+          ElevatedButton(
+            onPressed: _sendPointForm,
+            child: const Text('Save'),
+          ),
+        ]),
+      ),
     );
   }
 }

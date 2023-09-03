@@ -78,38 +78,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: const Text("S'enregistrer"),
       ),
-      body: FormLayer(forms: [
-        TextFormField(
-          controller: _emailController,
-          decoration: const InputDecoration(labelText: 'Email'),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        TextFormField(
-          controller: _usernameController,
-          decoration: const InputDecoration(labelText: 'Nom d\'utilisateur'),
-        ),
-        TextFormField(
-          controller: _passwordController,
-          decoration: const InputDecoration(labelText: 'Mot de passe'),
-          obscureText: true,
-        ),
-        TextFormField(
-          controller: _confirmPasswordController,
-          decoration:
-              const InputDecoration(labelText: 'Confirmer le mot de passe'),
-          obscureText: true,
-        ),
-        ElevatedButton(
-          onPressed: _register,
-          child: const Text('Valider l\'enregistrement'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Annuler'),
-        ),
-      ]),
+      body: SingleChildScrollView(
+        child: FormLayer(forms: [
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          TextFormField(
+            controller: _usernameController,
+            decoration: const InputDecoration(labelText: 'Nom d\'utilisateur'),
+          ),
+          TextFormField(
+            controller: _passwordController,
+            decoration: const InputDecoration(labelText: 'Mot de passe'),
+            obscureText: true,
+          ),
+          TextFormField(
+            controller: _confirmPasswordController,
+            decoration:
+                const InputDecoration(labelText: 'Confirmer le mot de passe'),
+            obscureText: true,
+          ),
+          ElevatedButton(
+            onPressed: _register,
+            child: const Text('Valider l\'enregistrement'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Annuler'),
+          ),
+        ]),
+      ),
     );
   }
 }

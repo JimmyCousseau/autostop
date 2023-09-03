@@ -36,8 +36,6 @@ class _AuthScreenState extends State<AuthScreen> {
           _preferences.getBool('rememberCredentials') ?? false;
       if (_rememberCredentials) {
         _emailController.text = _preferences.getString('savedEmail') ?? '';
-        _passwordController.text =
-            _preferences.getString('savedPassword') ?? '';
       }
     });
   }
@@ -46,10 +44,8 @@ class _AuthScreenState extends State<AuthScreen> {
     _preferences.setBool('rememberCredentials', _rememberCredentials);
     if (_rememberCredentials) {
       _preferences.setString('savedEmail', _emailController.text.trim());
-      _preferences.setString('savedPassword', _passwordController.text);
     } else {
       _preferences.remove('savedEmail');
-      _preferences.remove('savedPassword');
     }
   }
 
@@ -72,10 +68,12 @@ class _AuthScreenState extends State<AuthScreen> {
           const SnackBar(content: Text('Connecté')),
         );
         _saveRememberedCredentials();
+      } else {
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+              content: Text('Erreur: mauvais mot de passe ou email')),
+        );
       }
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Erreur: mauvais mot de passe ou email')),
-      );
     } catch (e) {
       scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Erreur: ${e.toString()}')),
@@ -89,48 +87,53 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(
         title: const Text('Authentification'),
       ),
-      body: FormLayer(forms: [
-        TextFormField(
-          keyboardType: TextInputType.emailAddress,
-          controller: _emailController,
-          decoration: const InputDecoration(labelText: 'Email'),
-        ),
-        TextFormField(
-          controller: _passwordController,
-          decoration: const InputDecoration(labelText: 'Mot de passe'),
-          obscureText: true,
-        ),
-        CheckboxListTile(
-          title: const Text(
-            'Se souvenir de moi',
-            style: TextStyle(fontWeight: FontWeight.normal),
+      body: SingleChildScrollView(
+        child: FormLayer(forms: [
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
+            onFieldSubmitted: (_) => _signIn,
           ),
-          value: _rememberCredentials,
-          onChanged: (value) {
-            setState(() {
-              _rememberCredentials = value!;
-            });
-          },
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
-          },
-          child: const Text("Mot de passe oublié"),
-        ),
-        ElevatedButton(
-          onPressed: _signIn,
-          child: const Text('Se connecter'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const RegisterScreen()));
-          },
-          child: const Text('S\'enregistrer'),
-        ),
-      ]),
+          TextFormField(
+            controller: _passwordController,
+            decoration: const InputDecoration(labelText: 'Mot de passe'),
+            obscureText: true,
+            onFieldSubmitted: (_) => _signIn,
+          ),
+          CheckboxListTile(
+            title: const Text(
+              'Se souvenir de moi',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+            value: _rememberCredentials,
+            onChanged: (value) {
+              setState(() {
+                _rememberCredentials = value!;
+                _saveRememberedCredentials();
+              });
+            },
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
+            },
+            child: const Text("Mot de passe oublié"),
+          ),
+          ElevatedButton(
+            onPressed: _signIn,
+            child: const Text('Se connecter'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RegisterScreen()));
+            },
+            child: const Text('S\'enregistrer'),
+          ),
+        ]),
+      ),
     );
   }
 }

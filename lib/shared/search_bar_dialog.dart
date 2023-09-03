@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:autostop/shared/parameter_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/osm_service.dart';
 
@@ -22,6 +25,47 @@ class SearchBarDialog extends StatefulWidget {
 class _SearchBarDialogState extends State<SearchBarDialog> {
   final OsmService _osmService = OsmService();
   final double _padding = 8.0;
+  final int _limitSearchedCities = 3;
+  final int _limitCitiesShowed = 5;
+
+  late final SharedPreferences _preferences;
+  List<City> _previousSearchedCities = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedSearchs();
+  }
+
+  void _loadRememberedSearchs() async {
+    _preferences = await SharedPreferences.getInstance();
+    setState(() {
+      final List<String> cityListData =
+          _preferences.getStringList('cityList') ?? [];
+      _previousSearchedCities = cityListData.map((cityData) {
+        final Map<String, dynamic> cityMap = jsonDecode(cityData);
+        return City(cityMap['pos'], cityMap['name'], cityMap['moreInfo']);
+      }).toList();
+    });
+  }
+
+  void _saveRememberedSearchs(City newSearch) {
+    if (_previousSearchedCities.contains(newSearch)) {
+      return;
+    }
+    setState(() {
+      if (_previousSearchedCities.length < _limitSearchedCities) {
+        _previousSearchedCities.add(newSearch);
+      } else if (_previousSearchedCities.length == _limitSearchedCities) {
+        _previousSearchedCities[_limitSearchedCities] = newSearch;
+      } else {
+        return;
+      }
+      _preferences.setStringList('cityList',
+          _previousSearchedCities.map((e) => jsonEncode(e)).toList());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildAutoComplete(context);
@@ -42,10 +86,11 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
               displayStringForOption: (option) => option.name,
               optionsBuilder: (TextEditingValue textEditingValue) {
                 if (textEditingValue.text.isEmpty) {
-                  return [];
+                  return _previousSearchedCities;
                 }
                 final sanitizedInput = _sanitizeText(textEditingValue.text);
-                return _osmService.searchCities(sanitizedInput);
+                return _osmService.searchCities(sanitizedInput,
+                    limit: _limitCitiesShowed);
               },
               onSelected: widget.onSelected,
               optionsViewBuilder: (BuildContext context,
@@ -85,11 +130,12 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
           controller: textEditingController,
           focusNode: focusNode,
           onSubmitted: (selectedCity) async {
-            // Throws an error
-
             try {
-              City city = (await _osmService.searchCities(selectedCity)).first;
+              City city = (await _osmService.searchCities(selectedCity,
+                      limit: _limitCitiesShowed))
+                  .first;
               widget.onSelected(city);
+              _saveRememberedSearchs(city);
             } on StateError catch (_) {
               // Search gave an empty response
             } catch (e) {
@@ -125,11 +171,21 @@ class _SearchBarDialogState extends State<SearchBarDialog> {
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) {
               City city = options.elementAt(index);
+              List<Widget> iconText = _previousSearchedCities.contains(city)
+                  ? [
+                      const Icon(Icons.watch_later_outlined),
+                      const SizedBox(width: 8)
+                    ]
+                  : [];
+              iconText.add(Text(city.name));
               return ListTile(
-                title: Text(city.name),
+                title: Row(
+                  children: iconText,
+                ),
                 subtitle: Text(city.moreInfo),
                 onTap: () {
                   onSelected(city);
+                  _saveRememberedSearchs(city);
                 },
               );
             },
