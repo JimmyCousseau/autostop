@@ -4,26 +4,25 @@ class CommentService {
   final CollectionReference commentsCollection =
       FirebaseFirestore.instance.collection('comments');
 
-  Future<Rate> getCommentCountAndAverageRate(String documentId) async {
+  Future<Rate> getCommentCountAndAverageRate(
+      String documentId, int pointEstimatedTime) async {
     final querySnapshot = await commentsCollection
         .where('point_id', isEqualTo: documentId)
         .where('approved', isEqualTo: true)
         .get();
 
-    final totalComments = querySnapshot.docs.length;
-    double totalEstimatedTime = 0;
+    final totalComments = querySnapshot.docs.length + 1;
+    double estimatedTimeWaiting = pointEstimatedTime.toDouble();
 
     for (var doc in querySnapshot.docs) {
-      totalEstimatedTime += doc['estimated_time'];
+      estimatedTimeWaiting += doc['estimated_time'];
     }
-    final double estimatedTime = (totalComments > 0 && totalEstimatedTime >= 0)
-        ? totalEstimatedTime / totalComments
-        : 0.0;
-
-    return Rate(estimatedTime: estimatedTime, totalComments: totalComments);
+    return Rate(
+        estimatedTimeWaiting: estimatedTimeWaiting,
+        totalComments: totalComments - 1);
   }
 
-  Future<List<Comment>> getCommentsForPoint(String pointId) async {
+  Future<List<Comment>> getCommentsBy(String pointId) async {
     final querySnapshot = await commentsCollection
         .where('point_id', isEqualTo: pointId)
         .where('approved', isEqualTo: true)
@@ -38,8 +37,15 @@ class CommentService {
     }).toList();
   }
 
-  Future<void> createComment(Comment comment) async {
-    await commentsCollection.add(comment.toJson());
+  Future<DocumentReference> upsert(Comment comment) async {
+    if (comment.documentId == null) {
+      return await commentsCollection.add(comment.toJson());
+    } else {
+      final ref = commentsCollection.doc(comment.documentId);
+      ref.update(comment.toJson());
+      // TODO: Should control what to update
+      return ref;
+    }
   }
 }
 
@@ -54,6 +60,7 @@ class Comment {
   final bool approved;
   final double destLat;
   final double destLng;
+  final String destName;
 
   Comment({
     this.documentId,
@@ -66,6 +73,7 @@ class Comment {
     required this.approved,
     required this.destLat,
     required this.destLng,
+    required this.destName,
   });
 
   factory Comment.fromJson(String documentId, Map<String, dynamic> json) {
@@ -80,6 +88,7 @@ class Comment {
       approved: json['approved'] ?? false,
       destLat: json['destination_latitude'] ?? 0.0,
       destLng: json['destination_longitude'] ?? 0.0,
+      destName: json['destination_name'] ?? "",
     );
   }
 
@@ -91,6 +100,7 @@ class Comment {
       'estimated_time': estimatedTime,
       'destination_latitude': destLat,
       'destination_longitude': destLng,
+      'destination_name': destName,
       'updated_at': updatedAt,
       'approved': approved,
       'creator_mail': userMail,
@@ -99,8 +109,8 @@ class Comment {
 }
 
 class Rate {
-  final double estimatedTime;
+  final double estimatedTimeWaiting;
   final int totalComments;
 
-  Rate({required this.estimatedTime, required this.totalComments});
+  Rate({required this.estimatedTimeWaiting, required this.totalComments});
 }

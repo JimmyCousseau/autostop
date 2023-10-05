@@ -1,5 +1,5 @@
 import 'package:autostop/shared/form_layer.dart';
-import 'package:autostop/shared/search_bar_dialog.dart';
+import 'package:autostop/shared/search_city_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,6 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
   late final TextEditingController _estimatedTimeController;
 
   final _commentService = CommentService();
-  double _userRating = 0.0;
   City? _destCity;
 
   @override
@@ -36,59 +35,46 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
         TextEditingController(text: widget.userComment?.content ?? '');
     _titleController =
         TextEditingController(text: widget.userComment?.title ?? '');
-    _userRating = widget.userComment?.estimatedTime.toDouble() ?? 0.0;
-    _estimatedTimeController = TextEditingController();
+    _estimatedTimeController = TextEditingController(
+        text: widget.userComment?.estimatedTime.toString());
   }
 
-  void _validateAndSendComment() async {
+  void _validateAndSendComment() {
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    if (_userRating == 0) {
-      _showMessage(
-        scaffoldMessenger,
-        "Veuillez sélectionner une évaluation en cliquant sur les étoiles",
-      );
-    } else if (_commentController.text.isEmpty) {
-      _showMessage(
-        scaffoldMessenger,
-        "Veuillez remplir le champ commentaire",
-      );
-    } else if (_titleController.text.isEmpty) {
-      _showMessage(
-        scaffoldMessenger,
-        "Veuillez mettre un titre",
-      );
-    } else if (_destCity == null) {
+    final int estimatedTime = int.tryParse(_estimatedTimeController.text)!;
+    if (_destCity == null) {
       _showMessage(
           scaffoldMessenger, "Veuillez choisir une destination valide");
-    } else {
-      try {
-        LatLng point = _destCity!.pos;
-        await _commentService.createComment(
-          Comment(
-            pointId: widget.pointDocumentId,
-            estimatedTime: _userRating.toInt(),
-            content: _commentController.text.trim(),
-            updatedAt: DateTime.now(),
-            title: _titleController.text.trim(),
-            userMail: FirebaseAuth.instance.currentUser!.email!,
-            approved: false,
-            destLat: point.latitude,
-            destLng: point.longitude,
-          ),
-        );
-        navigator.pop(); // Close the comment screen
+      return;
+    }
+    try {
+      LatLng dest = _destCity!.pos;
+      _commentService.upsert(
+        Comment(
+          pointId: widget.pointDocumentId,
+          estimatedTime: estimatedTime,
+          content: _commentController.text.trim(),
+          updatedAt: DateTime.now(),
+          title: _titleController.text.trim(),
+          userMail: FirebaseAuth.instance.currentUser!.email!,
+          approved: false,
+          destLat: dest.latitude,
+          destLng: dest.longitude,
+          destName: _destCity!.name.trim(),
+        ),
+      );
+      navigator.pop(); // Close the comment screen
 
-        _showMessage(
-          scaffoldMessenger,
-          'Votre commentaire sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !',
-        );
-      } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
-        _showMessage(scaffoldMessenger, "Une erreur est survenue : $e");
+      _showMessage(
+        scaffoldMessenger,
+        'Votre commentaire sera examiné par un modérateur dans les prochains jours, merci d\'avoir contribué !',
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
       }
+      _showMessage(scaffoldMessenger, "Une erreur est survenue");
     }
   }
 
@@ -122,35 +108,18 @@ class _CommentFormScreenState extends State<CommentFormScreen> {
                 if (value == null || value.isEmpty) {
                   return "Merci de compléter le temps d'attente estimé";
                 }
-                final val = double.tryParse(value);
-                if (val!.isNaN || val.isNegative) {
+                final val = int.tryParse(value);
+                if (val == null || val.isNegative || val == 0) {
                   return "Merci de mettre un nombre valide et non négatif";
                 }
                 return null;
               },
             ),
-            Text("Destination", style: Theme.of(context).textTheme.titleLarge),
-            if (_destCity == null)
-              SearchBarDialog(
-                onSelected: (city) {
-                  setState(() {
-                    _destCity = city;
-                  });
-                },
-                showParameterIcon: false,
-              ),
-            if (_destCity != null)
-              Row(children: [
-                Text(_destCity!.name),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _destCity = null;
-                    });
-                  },
-                  icon: const Icon(Icons.delete),
-                )
-              ]),
+            SearchCityFormField(onChanged: (City? city) {
+              setState(() {
+                _destCity = city;
+              });
+            }),
             TextFormField(
               keyboardType: TextInputType.text,
               controller: _titleController,

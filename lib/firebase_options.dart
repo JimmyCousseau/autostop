@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
     authDomain: 'autostop-acf5d.firebaseapp.com',
-    databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
     measurementId: 'G-ZLV7KVTFKT',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:336514695273:android:8feca309439628970a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
-    databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
   );
 
@@ -68,9 +70,11 @@ class DefaultFirebaseOptions {
     appId: '1:336514695273:ios:7886068dc77eaf5b0a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
-    databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
-    iosClientId: '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
+    iosClientId:
+        '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
     iosBundleId: 'com.cousseaujimmy.autostop',
   );
 
@@ -79,9 +83,11 @@ class DefaultFirebaseOptions {
     appId: '1:336514695273:ios:7886068dc77eaf5b0a22f8',
     messagingSenderId: '336514695273',
     projectId: 'autostop-acf5d',
-    databaseURL: 'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://autostop-acf5d-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'autostop-acf5d.appspot.com',
-    iosClientId: '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
+    iosClientId:
+        '336514695273-rl7ha469celn1pu4rpo3q880m9tdfgvd.apps.googleusercontent.com',
     iosBundleId: 'com.cousseaujimmy.autostop',
   );
 }

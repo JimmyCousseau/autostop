@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:autostop/layouts/popup_info_point.dart';
 import 'package:autostop/layouts/popup_new_point.dart';
 import 'package:autostop/models/map_preferences.dart';
-import 'package:autostop/services/osm_service.dart';
 import 'package:autostop/services/point_service.dart';
-import 'package:autostop/shared/search_bar_dialog.dart';
+import 'package:autostop/shared/btn_icon_txt.dart';
+import 'package:autostop/shared/map_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
@@ -30,13 +31,14 @@ class _MapScreenState extends State<MapScreen> {
   final double _minZoom = 2.0;
   final double _maxZoom = 18.0;
   final location.Location _location = location.Location();
-  location.PermissionStatus? _permissionStatus;
 
-  Marker? _selectedMarker;
-  List<Marker> _markers = [];
+  PointMarker? _selectedMarker;
+  PointMarker? _currentPosition;
+  late final List<PointMarker> _markers;
+  List<PointMarker> _showedMarkers = [];
+  SearchArea? _searchArea;
 
-  final Stream<List<Point>> _streamListPoint =
-      PointService().getApprovedPointsStream();
+  final Stream<List<Point>> _streamListPoint = PointService().getApproved();
 
   void _zoomIn() {
     if (_mapController.zoom < _maxZoom) {
@@ -50,32 +52,53 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  Future<void> _checkPermission() async {
-    final status = await _location.hasPermission();
+  Future<bool> _requestPermission() async {
+    final scaffold = ScaffoldMessenger.of(context);
+    bool hasPermission = location.PermissionStatus.granted ==
+        (await _location.requestPermission());
+    if (hasPermission) {
+      scaffold.showSnackBar(const SnackBar(
+          content: Text(
+              "Réeffectuez votre action, vous pouvez désormais le faire !")));
+    }
+    return hasPermission;
+  }
+
+  void _setSearchArea(bool clear) {
     setState(() {
-      _permissionStatus = status;
+      _searchArea = clear
+          ? null
+          : SearchArea(_mapPreferences.currentPositionZoom!,
+              _mapPreferences.currentPosition!);
     });
   }
 
-  Future<void> _requestPermission() async {
-    final status = await _location.requestPermission();
-    setState(() {
-      _permissionStatus = status;
-      if (location.PermissionStatus.granted == status) {
-        _detectAndZoomToLocation();
-      }
-    });
+  Future<bool> _hasLocationPermission() async {
+    return (await _location.hasPermission()) ==
+        location.PermissionStatus.granted;
   }
 
-  Future<void> _detectAndZoomToLocation() async {
-    if (_permissionStatus == location.PermissionStatus.granted) {
+  Future<LatLng> _getLocation() async {
+    if (await _hasLocationPermission()) {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      _mapController.move(LatLng(position.latitude, position.longitude), 15);
+      final pos = LatLng(position.latitude, position.longitude);
+      _currentPosition = PointMarker.constructor(
+          PointType.currentPosition, Point.fromLatLng(pos));
+      Future.delayed(const Duration(seconds: 10), _getLocation);
+      _showedMarkers.remove(_currentPosition);
+      _showedMarkers.add(_currentPosition!);
+      return pos;
     } else {
       _requestPermission();
+      throw ("Doesn't have the required permission: Location\nWhen getting location");
     }
+  }
+
+  Future<void> _zoomToLocation(LatLng position) async {
+    _mapController.move(position, 15);
+    _placeMarker(position);
   }
 
   @override
@@ -83,7 +106,6 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _mapPreferences = MapPreferences();
     _loadMapLastState();
-    _checkPermission();
   }
 
   @override
@@ -100,14 +122,15 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       if (preferencesJson != null) {
         _mapPreferences = MapPreferences.fromJson(jsonDecode(preferencesJson));
-        _selectedMarker = _getSelectedMarker(_mapPreferences.selectedMarker!);
+        _selectedMarker = PointMarker.constructor(PointType.searchedOrSelected,
+            Point.fromLatLng(_mapPreferences.selectedMarker!));
       }
     });
   }
 
   void _saveMapState() async {
     _mapPreferences = MapPreferences(
-      selectedMarker: _selectedMarker!.point,
+      selectedMarker: _selectedMarker!.p.toLatLng(),
       currentPosition: _mapController.center,
       currentPositionZoom: _mapController.zoom,
     );
@@ -117,17 +140,89 @@ class _MapScreenState extends State<MapScreen> {
         'mapPreferences', json.encode(_mapPreferences.toJson()));
   }
 
+  void _removePlacedMarker() {
+    setState(() {
+      _showedMarkers.remove(_selectedMarker);
+    });
+  }
+
+  void _placeMarker(LatLng point) {
+    setState(() {
+      _showedMarkers.remove(_selectedMarker);
+      _selectedMarker = PointMarker.constructor(
+          PointType.searchedOrSelected, Point.fromLatLng(point));
+      _showedMarkers.add(_selectedMarker!);
+      _popupLayerController.showPopupsOnlyFor([_selectedMarker!]);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    const int radiusSearch = 5;
     return Scaffold(
       body: Stack(
         children: [
           _buildMap(),
-          SearchBarDialog(onSelected: _placeFindMarker),
-          _buildBottomButtons(),
+          MapSearchBar(
+            onSelected: (city) {
+              if (city != null) {
+                if (_currentPosition != null) {
+                  setState(() {
+                    _setSearchArea(false);
+                    _showedMarkers = _markers
+                        .where((e) =>
+                            e.pointType == PointType.spot &&
+                            _getDistanceHaversine(_searchArea!.pos, e.point) <
+                                radiusSearch &&
+                            _isP3BetweenP2P1(city.pos, _searchArea!.pos,
+                                LatLng(e.p.destLat, e.p.destLng), 10))
+                        .toList();
+                  });
+                } else {
+                  _getLocation();
+                }
+              } else {
+                setState(() {
+                  _searchArea = null;
+                  _showedMarkers = _markers;
+                });
+              }
+            },
+            onClear: () => _setSearchArea(true),
+          ),
+          _buildRightBottomButtons(),
+          _buildCenterBottomButtons(),
         ],
       ),
     );
+  }
+
+  double _getDistanceHaversine(LatLng p1, LatLng p2) {
+    const earthRadius = 6371; // In km
+
+    final double dLat = degToRadian(p2.latitude - p1.latitude);
+    final double dLng = degToRadian(p2.longitude - p1.longitude);
+
+    final a = pow(sin(dLat / 2), 2) +
+        cos(p1.latitude) * cos(p2.latitude) * pow(sin(dLng / 2), 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  bool _isP3BetweenP2P1(LatLng p1, LatLng p2, LatLng p3, double offset) {
+    double m = (p2.latitude - p1.latitude) / (p2.longitude - p1.longitude);
+    double b = p1.latitude - m * p1.longitude;
+    double a = -m;
+    double c = 1;
+    return _shortestDistFromStraightLigne(
+            a, b, c, p3.longitude, p3.longitude) <=
+        offset;
+  }
+
+  double _shortestDistFromStraightLigne(
+      double a, double b, double c, double x, double y) {
+    return (a * x + b * y + c).abs() / sqrt(a * a + b * b);
   }
 
   PopupScope _buildMap() {
@@ -141,25 +236,11 @@ class _MapScreenState extends State<MapScreen> {
           zoom: _mapPreferences.currentPositionZoom ?? 6,
           minZoom: _minZoom,
           maxZoom: _maxZoom,
-          rotationWinGestures: MultiFingerGesture.pinchZoom,
-          onTap: (_, __) {
-            _popupLayerController.hideAllPopups();
-            setState(() {
-              if (_selectedMarker != null) {
-                _markers.remove(_selectedMarker!);
-              }
-            });
-          },
-          onLongPress: (tapPosition, point) {
-            _popupLayerController.hideAllPopups();
-            setState(() {
-              if (_selectedMarker != null) {
-                _markers.remove(_selectedMarker!);
-              }
-              _selectedMarker = _getSelectedMarker(point);
-              _markers.add(_selectedMarker!);
-            });
-          },
+          enableMultiFingerGestureRace: true,
+          rotationWinGestures: MultiFingerGesture.none,
+          pinchMoveWinGestures: MultiFingerGesture.pinchZoom,
+          onTap: (_, __) => _removePlacedMarker(),
+          onLongPress: (tapPosition, point) => _placeMarker(point),
         ),
         children: [
           TileLayer(
@@ -174,20 +255,12 @@ class _MapScreenState extends State<MapScreen> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
-                  if (_markers == [] ||
-                      _markers.length - (_selectedMarker == null ? 0 : 1) !=
-                          snapshot.data!.length) {
-                    _markers = <Marker>[] +
-                        snapshot.data!.map((e) => PointMarker(p: e)).toList();
+                  if (_markers.isEmpty) {
+                    _markers = snapshot.data!
+                        .map((e) => PointMarker.constructor(PointType.spot, e))
+                        .toList();
+                    _showedMarkers = _markers;
                   }
-                  if (_selectedMarker != null &&
-                      _markers.contains(_selectedMarker!)) {
-                    Future.delayed(
-                        const Duration(milliseconds: 100),
-                        () => _popupLayerController
-                            .showPopupsOnlyFor([_selectedMarker!]));
-                  }
-
                   return _buildPopupMarkerLayer();
                 } else {
                   return const Text('No data available');
@@ -198,7 +271,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Positioned _buildBottomButtons() {
+  Positioned _buildRightBottomButtons() {
     return Positioned(
       bottom: 16,
       right: 16,
@@ -206,7 +279,13 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           FloatingActionButton(
             heroTag: 'detectLoc',
-            onPressed: _detectAndZoomToLocation,
+            onPressed: () async {
+              if (await _hasLocationPermission()) {
+                await _zoomToLocation(await _getLocation());
+              } else {
+                await _requestPermission();
+              }
+            },
             tooltip: 'Détecter ma position',
             child: const Icon(Icons.my_location),
           ),
@@ -229,54 +308,91 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  Positioned _buildCenterBottomButtons() {
+    return Positioned(
+        bottom: 16,
+        right: 16,
+        child: BtnIconText(
+            icon: Icons.refresh,
+            text: "Chercher dans cette zone",
+            onPressed: () {
+              _setSearchArea(false);
+            }));
+  }
+
   PopupMarkerLayer _buildPopupMarkerLayer() {
     return PopupMarkerLayer(
       options: PopupMarkerLayerOptions(
-        markers: _markers,
+        markers: _showedMarkers,
         popupController: _popupLayerController,
         popupDisplayOptions: PopupDisplayOptions(builder: (_, marker) {
           if (marker is PointMarker) {
-            return PopupInfoPoint(point: marker.p);
+            if (marker.pointType == PointType.spot) {
+              return PopupInfoPoint(point: marker.p);
+            } else if (marker.pointType == PointType.searchedOrSelected) {
+              return PopupNewPoint(point: marker.p);
+            } else {
+              throw ("Point type not define when building popup marker layer");
+            }
+          } else {
+            throw ("A marker is not a point marker");
           }
-          return PopupNewPoint(p: marker.point);
         }),
       ),
-    );
-  }
-
-  void _placeFindMarker(City city) {
-    _mapController.move(city.pos, 13);
-    setState(() {
-      if (_selectedMarker != null) {
-        _markers.remove(_selectedMarker);
-      }
-      _selectedMarker = _getSelectedMarker(city.pos);
-      _markers.add(_selectedMarker!);
-    });
-  }
-
-  Marker _getSelectedMarker(LatLng point) {
-    return Marker(
-      builder: (context) => const Icon(
-        Icons.location_on,
-        size: Point.size,
-        color: Colors.blue,
-      ),
-      point: point,
     );
   }
 }
 
 class PointMarker extends Marker {
   final Point p;
+  final PointType pointType;
+  final Icon icon;
 
-  PointMarker({required this.p})
+  PointMarker._(this.pointType, this.p, this.icon)
       : super(
           anchorPos: AnchorPos.align(AnchorAlign.top),
           height: Point.size,
           width: Point.size,
           point: LatLng(p.latitude, p.longitude),
-          builder: (_) => const Icon(Icons.location_on,
+          builder: (_) => icon,
+        );
+
+  static PointMarker constructor(PointType pointType, Point p) {
+    switch (pointType) {
+      case PointType.spot:
+        return PointMarker._(
+          pointType,
+          p,
+          const Icon(Icons.location_on, size: Point.size, color: Colors.blue),
+        );
+      case PointType.searchedOrSelected:
+        return PointMarker._(
+          pointType,
+          p,
+          const Icon(Icons.location_on, size: Point.size, color: Colors.red),
+        );
+      case PointType.currentPosition:
+        return PointMarker._(
+          pointType,
+          p,
+          const Icon(Icons.person_pin_circle_rounded,
               size: Point.size, color: Colors.red),
         );
+      default:
+        throw ("Point type not defined when constructing");
+    }
+  }
+}
+
+class SearchArea {
+  final double zoom;
+  final LatLng pos;
+
+  SearchArea(this.zoom, this.pos);
+}
+
+enum PointType {
+  spot,
+  searchedOrSelected,
+  currentPosition,
 }

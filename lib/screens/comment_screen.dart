@@ -21,8 +21,7 @@ class _CommentScreenState extends State<CommentScreen> {
   @override
   void initState() {
     super.initState();
-    _commentsFuture =
-        CommentService().getCommentsForPoint(widget.pointDocumentId);
+    _commentsFuture = CommentService().getCommentsBy(widget.pointDocumentId);
   }
 
   @override

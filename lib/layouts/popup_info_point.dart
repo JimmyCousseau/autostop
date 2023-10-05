@@ -1,6 +1,8 @@
 import 'package:autostop/screens/auth_screen.dart';
+import 'package:autostop/screens/comment_form_screen.dart';
 import 'package:autostop/screens/comment_screen.dart';
 import 'package:autostop/services/comment_service.dart';
+import 'package:autostop/shared/btn_icon_txt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +24,8 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
   @override
   void initState() {
     super.initState();
-    _commentDataFuture = CommentService()
-        .getCommentCountAndAverageRate(widget.point.documentId!);
+    _commentDataFuture = CommentService().getCommentCountAndAverageRate(
+        widget.point.documentId!, widget.point.estimatedTime);
   }
 
   String updatedDays(DateTime updated) {
@@ -98,10 +100,19 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
               const SizedBox(
                 height: 8.0,
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: BtnIconText(
+                    icon: Icons.navigation,
+                    text: "S'y rendre",
+                    onPressed: widget.point.openInMap),
+              ),
               if (!isAuthenticated)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
+                  child: BtnIconText(
+                    icon: Icons.person,
+                    text: "Connectez-vous pour plus d'options",
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -110,7 +121,6 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
                         ),
                       );
                     },
-                    child: const Text("Connectez-vous pour plus d'options"),
                   ),
                 )
             ]),
@@ -130,16 +140,23 @@ class _PopupInfoPointState extends State<PopupInfoPoint> {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           Rate rate = snapshot.data!;
+          String parenthesis = rate.totalComments > 0
+              ? "(${rate.totalComments} avis)"
+              : "(Écrire un commentaire)";
           return InkWell(
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    CommentScreen(pointDocumentId: widget.point.documentId!),
-              ),
+              MaterialPageRoute(builder: (_) {
+                if (rate.totalComments > 0) {
+                  return CommentScreen(
+                      pointDocumentId: widget.point.documentId!);
+                }
+                return CommentFormScreen(
+                    pointDocumentId: widget.point.documentId!);
+              }),
             ),
             child: Text(
-              "Temps d'attente estimé: \n${rate.estimatedTime.toStringAsFixed(0)} minutes (${rate.totalComments} avis)",
+              "Temps d'attente estimé: \n${rate.estimatedTimeWaiting.toStringAsFixed(0)} minutes $parenthesis",
               softWrap: true,
             ),
           );

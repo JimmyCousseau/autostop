@@ -13,7 +13,7 @@ class OsmService {
 
     _searchDebouncer.run(() async {
       final response = await http.get(Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=$limit&addressdetails=1&extratags=1&countrycodes=fr,it,de,es,gb'));
+          'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=$limit&addressdetails=1&extratags=1&countrycodes=fr'));
       if (response.statusCode == 200) {
         final data =
             utf8.decode(response.bodyBytes); // Decode the response body
