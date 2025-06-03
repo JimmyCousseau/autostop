@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
       iconTheme: const IconThemeData(color: fg),
       iconButtonTheme: const IconButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: MaterialStatePropertyAll(bg),
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(bg),
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
         ),
       ),
       buttonTheme: const ButtonThemeData(
@@ -56,13 +56,13 @@ class MyApp extends StatelessWidget {
       ),
       elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: MaterialStatePropertyAll(bg),
-          textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(bg),
+          textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),
       checkboxTheme: const CheckboxThemeData(
-        checkColor: MaterialStatePropertyAll(primaryColor),
+        checkColor: WidgetStatePropertyAll(primaryColor),
       ),
     );
   }
@@ -85,9 +85,9 @@ class MyApp extends StatelessWidget {
       ),
       elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: MaterialStatePropertyAll(fg),
-          textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 14)),
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(fg),
+          textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 14)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -97,12 +97,12 @@ class MyApp extends StatelessWidget {
       iconTheme: const IconThemeData(color: fg),
       iconButtonTheme: const IconButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: MaterialStatePropertyAll(fg),
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(fg),
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
         ),
       ),
       checkboxTheme: const CheckboxThemeData(
-        checkColor: MaterialStatePropertyAll(primaryColor),
+        checkColor: WidgetStatePropertyAll(primaryColor),
       ),
     );
   }

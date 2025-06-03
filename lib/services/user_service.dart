@@ -88,8 +88,7 @@ class UserService {
           actions: [
             ElevatedButton(
                 style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll(Colors.redAccent)),
+                    backgroundColor: WidgetStatePropertyAll(Colors.redAccent)),
                 onPressed: () async {
                   final scaffold = Scaffold.of(context);
                   final navigator = Navigator.of(context);
@@ -125,7 +124,7 @@ class UserService {
               ElevatedButton(
                   style: const ButtonStyle(
                       backgroundColor:
-                          MaterialStatePropertyAll(Colors.redAccent)),
+                          WidgetStatePropertyAll(Colors.redAccent)),
                   onPressed: () {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (_) => const AccountDeletionPage()));

@@ -38,7 +38,7 @@ class ParameterDialog extends StatelessWidget {
                 onPressed: () {},
                 icon: const Icon(null),
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+                  backgroundColor: WidgetStatePropertyAll(Colors.transparent),
                 ),
               ),
             ],
