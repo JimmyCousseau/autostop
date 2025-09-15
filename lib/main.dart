@@ -107,8 +107,8 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  CardTheme _getCardTheme(Color? color) {
-    return CardTheme(
+  CardThemeData _getCardTheme(Color? color) {
+    return CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),

@@ -34,21 +34,23 @@ class _MapScreenState extends State<MapScreen> {
 
   PointMarker? _selectedMarker;
   PointMarker? _currentPosition;
-  late final List<PointMarker> _markers;
+  List<PointMarker> _markers = [];
   List<PointMarker> _showedMarkers = [];
   SearchArea? _searchArea;
 
   final Stream<List<Point>> _streamListPoint = PointService().getApproved();
 
   void _zoomIn() {
-    if (_mapController.zoom < _maxZoom) {
-      _mapController.move(_mapController.center, _mapController.zoom + 1);
+    if (_mapController.camera.zoom < _maxZoom) {
+      _mapController.move(
+          _mapController.camera.center, _mapController.camera.zoom + 1);
     }
   }
 
   void _zoomOut() {
-    if (_mapController.zoom > _minZoom) {
-      _mapController.move(_mapController.center, _mapController.zoom - 1);
+    if (_mapController.camera.zoom > _minZoom) {
+      _mapController.move(
+          _mapController.camera.center, _mapController.camera.zoom - 1);
     }
   }
 
@@ -80,9 +82,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<LatLng> _getLocation() async {
     if (await _hasLocationPermission()) {
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      final position = await Geolocator.getCurrentPosition();
       final pos = LatLng(position.latitude, position.longitude);
       _currentPosition = PointMarker.constructor(
           PointType.currentPosition, Point.fromLatLng(pos));
@@ -105,7 +105,7 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _mapPreferences = MapPreferences();
-    _loadMapLastState();
+    _loadMapLastState().then((_) => setState(() {}));
   }
 
   @override
@@ -116,23 +116,29 @@ class _MapScreenState extends State<MapScreen> {
     super.dispose();
   }
 
-  void _loadMapLastState() async {
+  Future<void> _loadMapLastState() async {
     final preferences = await SharedPreferences.getInstance();
     final preferencesJson = preferences.getString('mapPreferences');
-    setState(() {
-      if (preferencesJson != null) {
-        _mapPreferences = MapPreferences.fromJson(jsonDecode(preferencesJson));
-        _selectedMarker = PointMarker.constructor(PointType.searchedOrSelected,
-            Point.fromLatLng(_mapPreferences.selectedMarker!));
+    if (preferencesJson != null) {
+      final jsonPreferences = jsonDecode(preferencesJson);
+      if (jsonPreferences != null) {
+        setState(() {
+          _mapPreferences = MapPreferences.fromJson(jsonPreferences);
+          if (_mapPreferences.selectedMarker != null) {
+            _selectedMarker = PointMarker.constructor(
+                PointType.searchedOrSelected,
+                Point.fromLatLng(_mapPreferences.selectedMarker!));
+          }
+        });
       }
-    });
+    }
   }
 
   void _saveMapState() async {
     _mapPreferences = MapPreferences(
       selectedMarker: _selectedMarker!.p.toLatLng(),
-      currentPosition: _mapController.center,
-      currentPositionZoom: _mapController.zoom,
+      currentPosition: _mapController.camera.center,
+      currentPositionZoom: _mapController.camera.zoom,
     );
 
     final preferences = await SharedPreferences.getInstance();
@@ -231,14 +237,16 @@ class _MapScreenState extends State<MapScreen> {
       child: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          center: _mapPreferences.currentPosition ??
+          initialCenter: _mapPreferences.currentPosition ??
               const LatLng(46.59212, 2.46081),
-          zoom: _mapPreferences.currentPositionZoom ?? 6,
+          initialZoom: _mapPreferences.currentPositionZoom ?? 6,
+          interactionOptions: const InteractionOptions(
+            enableMultiFingerGestureRace: true,
+            rotationWinGestures: MultiFingerGesture.none,
+            pinchMoveWinGestures: MultiFingerGesture.pinchZoom,
+          ),
           minZoom: _minZoom,
           maxZoom: _maxZoom,
-          enableMultiFingerGestureRace: true,
-          rotationWinGestures: MultiFingerGesture.none,
-          pinchMoveWinGestures: MultiFingerGesture.pinchZoom,
           onTap: (_, __) => _removePlacedMarker(),
           onLongPress: (tapPosition, point) => _placeMarker(point),
         ),
@@ -255,7 +263,7 @@ class _MapScreenState extends State<MapScreen> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
-                  if (_markers.isEmpty) {
+                  if (_markers.isEmpty && snapshot.data != null) {
                     _markers = snapshot.data!
                         .map((e) => PointMarker.constructor(PointType.spot, e))
                         .toList();
@@ -350,11 +358,11 @@ class PointMarker extends Marker {
 
   PointMarker._(this.pointType, this.p, this.icon)
       : super(
-          anchorPos: AnchorPos.align(AnchorAlign.top),
+          alignment: Alignment.topCenter,
           height: Point.size,
           width: Point.size,
           point: LatLng(p.latitude, p.longitude),
-          builder: (_) => icon,
+          child: icon,
         );
 
   static PointMarker constructor(PointType pointType, Point p) {

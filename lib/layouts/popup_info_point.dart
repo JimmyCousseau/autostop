@@ -12,7 +12,7 @@ import '../services/point_service.dart';
 class PopupInfoPoint extends StatefulWidget {
   final Point point;
 
-  const PopupInfoPoint({Key? key, required this.point}) : super(key: key);
+  const PopupInfoPoint({super.key, required this.point});
 
   @override
   State<PopupInfoPoint> createState() => _PopupInfoPointState();
